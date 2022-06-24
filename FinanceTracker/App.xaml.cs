@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
 
-namespace MoneyTracker
+namespace FinanceTracker
 {
 	/// <summary>
 	/// Interaction logic for App.xaml
