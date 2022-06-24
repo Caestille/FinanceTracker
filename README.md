@@ -1,2 +1,2 @@
-# JoesProjects
-A repo for any of my projects
+# Finance Tracker
+A tool for importing and analysing financial data
