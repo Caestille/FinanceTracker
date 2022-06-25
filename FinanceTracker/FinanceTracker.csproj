@@ -18,4 +18,8 @@
     <Folder Include="Views\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\FinanceTracker.Core\FinanceTracker.Core.csproj" />
+  </ItemGroup>
+
 </Project>
