@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinanceTracker", "FinanceTr
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "FinanceTracker.Setup", "FinanceTracker.Setup\FinanceTracker.Setup.vdproj", "{94B98834-EACC-4C98-9DA4-EFE14B86DDA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FinanceTracker.Core", "FinanceTracker.Core\FinanceTracker.Core.csproj", "{41D39A55-A6FF-4E80-99BD-FA7A2D578A9D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FinanceTracker.Core", "FinanceTracker.Core\FinanceTracker.Core.csproj", "{41D39A55-A6FF-4E80-99BD-FA7A2D578A9D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
