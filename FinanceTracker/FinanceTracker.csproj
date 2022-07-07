@@ -8,14 +8,24 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Fonts\OpenSans-VariableFont_wdth,wght.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Page Remove="ThemableWindow.xaml" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreUtils" Version="1.0.6" />
+    <Resource Remove="C:\Users\jward\.nuget\packages\win10themables\1.0.17\contentFiles\any\net6.0-windows7.0\Fonts\OpenSans-VariableFont_wdth,wght.ttf" />
+    <Resource Remove="C:\Users\jward\.nuget\packages\win10themables\1.0.18\contentFiles\any\net6.0-windows7.0\Fonts\OpenSans-VariableFont_wdth,wght.ttf" />
+    <Resource Remove="C:\Users\jward\.nuget\packages\win10themables\1.0.21\contentFiles\any\net6.0-windows7.0\Fonts\OpenSans-VariableFont_wdth,wght.ttf" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CoreUtilities" Version="1.0.20" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-beta.300" />
     <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
-    <PackageReference Include="Win10Themables" Version="1.0.11" />
+    <PackageReference Include="Win10Themables" Version="1.0.24" />
   </ItemGroup>
 
   <ItemGroup>
@@ -24,6 +34,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FinanceTracker.Core\FinanceTracker.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Fonts\OpenSans-VariableFont_wdth,wght.ttf">
+      <Pack>True</Pack>
+    </Resource>
   </ItemGroup>
 
 </Project>

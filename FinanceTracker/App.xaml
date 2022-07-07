@@ -8,6 +8,8 @@
 			<ResourceDictionary.MergedDictionaries>
 				<ResourceDictionary Source="/Win10Themables;component/Styles.xaml" />
 			</ResourceDictionary.MergedDictionaries>
+
+			<FontFamily x:Key="OpenSans">/Fonts/#Open Sans</FontFamily>
 		</ResourceDictionary>
 	</Application.Resources>
 </Application>
