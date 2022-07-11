@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows.Input;
+﻿using System.Windows.Input;
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 
@@ -30,7 +29,7 @@ namespace FinanceTracker.Core.Models
 			get => isChecked;
 			set
 			{
-				bool updated = isChecked != value;
+				var updated = isChecked != value;
 				SetProperty(ref isChecked, value);
 				//if (updated && !suppressNextNotification)
 					//CheckedChanged?.Invoke(this, isChecked);
@@ -52,7 +51,7 @@ namespace FinanceTracker.Core.Models
 			get => isFilteredOut;
 			set
 			{
-				bool updated = isChecked != value;
+				var updated = isChecked != value;
 				SetProperty(ref isFilteredOut, value);
 				//if (updated)
 					//FilterStateChanged?.Invoke(this, isFilteredOut);

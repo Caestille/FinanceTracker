@@ -3,20 +3,27 @@
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:controls="clr-namespace:Win10Themables.Controls;assembly=Win10Themables"
+	xmlns:viewmodels="clr-namespace:FinanceTracker.ViewModels"
+	xmlns:views="clr-namespace:FinanceTracker.Views"
 	x:Name="Window"
 	Title="Finance Tracker"
 	Width="800"
 	Height="450"
 	AllowsTransparency="False"
+	FontFamily="{StaticResource OpenSans}"
+	FontSize="13"
 	RenderOptions.BitmapScalingMode="NearestNeighbor"
 	RenderOptions.ClearTypeHint="Enabled"
 	SnapsToDevicePixels="True"
 	UseLayoutRounding="True"
-	WindowStyle="None"
-	FontFamily="{StaticResource OpenSans}"
-	FontSize="13">
+	WindowStyle="None">
+	<Window.Resources>
+		<DataTemplate DataType="{x:Type viewmodels:MainViewModel}">
+			<views:MainView />
+		</DataTemplate>
+	</Window.Resources>
 	<WindowChrome.WindowChrome>
 		<WindowChrome CaptionHeight="24" ResizeBorderThickness="5" />
 	</WindowChrome.WindowChrome>
-	<controls:MainWindowControl />
+	<controls:MainWindowControl VisibleViewModel="{Binding ElementName=Window, Path=DataContext}"/>
 </Window>

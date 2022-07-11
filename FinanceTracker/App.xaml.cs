@@ -1,7 +1,7 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Reflection;
+﻿using FinanceTracker.Core.ViewModels;
+using FinanceTracker.ViewModels;
+using System;
+using System.Collections.Generic;
 using System.Windows;
 
 namespace FinanceTracker
@@ -21,7 +21,6 @@ namespace FinanceTracker
 
 		private static void ExceptionHandler(object sender, UnhandledExceptionEventArgs args)
 		{
-			// Do nothing in debug to avoid spam
 #if RELEASE
 			Exception e = (Exception)args.ExceptionObject;
 			if (!Directory.Exists(CrashReportsDirectory))
@@ -50,7 +49,23 @@ namespace FinanceTracker
 				StartingArgs = e.Args;
 			}
 
-			base.OnStartup(e);
+			var viewModels = new List<ViewModelBase>()
+			{
+				new DashboardViewModel(),
+				new BanksViewModel(),
+				new AnalysisViewModel(),
+				new BudgetingViewModel(),
+			};
+
+			var mainViewModel = new MainViewModel(viewModels);
+			viewModels[0].SelectCommand.Execute(null);
+
+			var mainView = new MainWindow()
+			{
+				DataContext = mainViewModel
+			};
+
+			mainView.Show();
 		}
 	}
 }
