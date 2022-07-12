@@ -7,7 +7,5 @@ namespace FinanceTracker.ViewModels
 		public AnalysisViewModel() : base("Analysis") { }
 
 		protected override void BindCommands() { }
-
-		protected override void BindMessages() { base.BindMessages(); }
 	}
 }

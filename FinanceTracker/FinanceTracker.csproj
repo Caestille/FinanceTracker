@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <None Remove="Fonts\OpenSans-VariableFont_wdth,wght.ttf" />
+    <None Remove="ViewModels\MainViewModel.cs~RF556275.TMP" />
   </ItemGroup>
 
   <ItemGroup>

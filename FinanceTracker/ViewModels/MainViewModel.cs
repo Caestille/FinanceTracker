@@ -8,13 +8,6 @@ namespace FinanceTracker.ViewModels
 {
 	public class MainViewModel : ViewModelBase
 	{
-		private RangeObservableCollection<ViewModelBase> viewModels = new RangeObservableCollection<ViewModelBase>();
-		public RangeObservableCollection<ViewModelBase> ViewModels
-		{
-			get => viewModels;
-			set => SetProperty(ref viewModels, value);
-		}
-
 		private ViewModelBase visibleViewModel;
 		public ViewModelBase VisibleViewModel
 		{
@@ -38,7 +31,8 @@ namespace FinanceTracker.ViewModels
 
 		public MainViewModel(List<ViewModelBase> viewModels) : base(string.Empty)
 		{
-			ViewModels.AddRange(viewModels);
+			ChildViewModels.AddRange(viewModels);
+			SetLevel(0);
 		}
 
 		protected override void BindMessages()

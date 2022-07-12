@@ -9,6 +9,8 @@ namespace FinanceTracker.Core.ViewModels
 {
 	public class ViewModelBase : ObservableRecipient
 	{
+		private Func<ViewModelBase> createChildFunc;
+
 		private string name;
 		public string Name
 		{
@@ -30,18 +32,13 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref isSelected, value);
 		}
 
-		private bool supportsAddingChildren;
-		public bool SupportsAddingChildren
-		{
-			get => supportsAddingChildren;
-			set => SetProperty(ref supportsAddingChildren, value);
-		}
+		public bool SupportsAddingChildren => createChildFunc != null;
 
-		private bool showChildren;
-		public bool ShowChildren
+		private bool isShowingChildren;
+		public bool IsShowingChildren
 		{
-			get => showChildren;
-			set => SetProperty(ref showChildren, value);
+			get => isShowingChildren;
+			set => SetProperty(ref isShowingChildren, value);
 		}
 
 		private int level = 0;
@@ -51,17 +48,17 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref level, value);
 		}
 
-		public ViewModelBase(string name)
+		public ViewModelBase(string name, Func<ViewModelBase> createChild = null)
 		{
 			Name = name;
+			createChildFunc = createChild;
 
 			BindCommands();
 			BindMessages();
-
-			AddLevelsToChildren();
 		}
 
 		public ICommand SelectCommand => new RelayCommand(Select);
+		public ICommand AddChildCommand => new RelayCommand(AddChild);
 
 		protected virtual void BindCommands() { }
 
@@ -78,26 +75,34 @@ namespace FinanceTracker.Core.ViewModels
 
 		private void Select()
 		{
-			if (ChildViewModels.Count != 0)
+			if (ChildViewModels.Count != 0 || SupportsAddingChildren)
 			{
-				ShowChildren = !ShowChildren;
+				IsShowingChildren = !IsShowingChildren;
 			}
-			else
-			{
-				Messenger.Send(new ViewModelRequestShowMessage(this));
-				IsSelected = true;
-			}
+
+			Messenger.Send(new ViewModelRequestShowMessage(this));
+			IsSelected = true;
 		}
 
-		private void AddLevelsToChildren()
+		protected void AddChild() 
 		{
-			ChildViewModels.ToList().ForEach(x => x.AddLevel());
+			ChildViewModels.Add(createChildFunc());
+
+			foreach (var vm in ChildViewModels)
+			{
+				vm.SetLevel(level + 1);
+			}
+
+			OnPropertyChanged(nameof(ChildViewModels));
 		}
 
-		protected void AddLevel()
+		protected void SetLevel(int level)
 		{
-			Level++;
-			AddLevelsToChildren();
+			Level = level;
+			foreach (var vm in ChildViewModels)
+			{
+				vm.SetLevel(level + 1);
+			}
 		}
 	}
 }

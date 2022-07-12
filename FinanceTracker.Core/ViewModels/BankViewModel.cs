@@ -3,20 +3,11 @@ using Microsoft.Toolkit.Mvvm.ComponentModel;
 
 namespace FinanceTracker.Core.ViewModels
 {
-	public class BankViewModel : ObservableObject
+	public class BankViewModel : ViewModelBase
 	{
-		private string name;
-		public string Name
+		public BankViewModel(string name) : base(name)
 		{
-			get => name;
-			set => SetProperty(ref name, value);
-		}
 
-		private RangeObservableCollection<AccountViewModel> accounts = new();
-		public RangeObservableCollection<AccountViewModel> Accounts
-		{
-			get => accounts;
-			set => SetProperty(ref accounts, value);
 		}
 	}
 }

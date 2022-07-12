@@ -7,7 +7,5 @@ namespace FinanceTracker.ViewModels
 		public DashboardViewModel() : base("Dashboard") { }
 
 		protected override void BindCommands() { }
-
-		protected override void BindMessages() { base.BindMessages(); }
 	}
 }

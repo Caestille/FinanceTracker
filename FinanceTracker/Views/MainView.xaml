@@ -19,6 +19,7 @@
 							Width="200"
 							Height="40"
 							Margin="0"
+							Padding="{Binding Level, Converter={StaticResource LeftPaddingConverter}, ConverterParameter=15}"
 							VerticalAlignment="Top"
 							HorizontalContentAlignment="Left"
 							Background="Transparent"
@@ -27,31 +28,56 @@
 							Content="{Binding Name}"
 							Foreground="{DynamicResource TextBrush}"
 							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
-							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
-							Padding="{Binding Level, Converter={StaticResource LeftPaddingConverter}, ConverterParameter=15}">
-						</controls:ExtendedButton>
-						<controls:ExtendedButton
-							Width="30"
-							Height="30"
-							Margin="0"
-							Content="+"
-							VerticalAlignment="Center"
-							VerticalContentAlignment="Center"
-							HorizontalContentAlignment="Center"
-							Padding="0"
-							FontSize="20"
-							CornerRadius="3"
-							Visibility="{Binding SupportsAddingChildren, Converter={StaticResource VisibleIfTrueConverter}}"
-							BorderThickness="0"
-							Foreground="{DynamicResource TextBrush}"
+							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}" />
+						<Border
+							x:Name="Border"
+							Width="15"
+							Height="{Binding ElementName=Border, Path=Width}"
+							Margin="0,3,30,0"
+							HorizontalAlignment="Right"
 							Background="{DynamicResource ControlClickablePartBrush}"
-							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
-							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}">
-						</controls:ExtendedButton>
+							CornerRadius="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+							Opacity="0.3"
+							Visibility="{Binding SupportsAddingChildren, Converter={StaticResource VisibleIfTrueConverter}}">
+						</Border>
+						<Grid
+							Width="{Binding ElementName=Border, Path=Width}"
+							Height="{Binding ElementName=Border, Path=Width}"
+							Margin="{Binding ElementName=Border, Path=Margin}"
+							HorizontalAlignment="Right"
+							Visibility="{Binding SupportsAddingChildren, Converter={StaticResource VisibleIfTrueConverter}}">
+							<controls:ExtendedButton
+								Background="Transparent"
+								BorderThickness="0"
+								Command="{Binding AddChildCommand}"
+								CornerRadius="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+								MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
+								MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
+								Opacity="0.5" />
+							<Grid Opacity="0.4">
+								<Line
+									IsHitTestVisible="False"
+									x:Name="Line1"
+									Stroke="{DynamicResource TextBrush}"
+									StrokeThickness="2"
+									X1="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+									X2="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+									Y1="3"
+									Y2="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}" />
+								<Line
+									IsHitTestVisible="False"
+									Stroke="{Binding ElementName=Line1, Path=Stroke}"
+									StrokeThickness="{Binding ElementName=Line1, Path=StrokeThickness}"
+									X1="3"
+									X2="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}"
+									Y1="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+									Y2="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}" />
+							</Grid>
+						</Grid>
 						<Grid
 							Width="10"
 							Height="10"
-							Margin="15,3,15,0"
+							Margin="0,3,15,0"
 							HorizontalAlignment="Right"
 							IsHitTestVisible="False"
 							RenderTransformOrigin="0.5,0.5"
@@ -60,7 +86,7 @@
 								<RotateTransform>
 									<RotateTransform.Angle>
 										<MultiBinding Converter="{StaticResource ValueIfTrueValueIfFalseConverter}">
-											<Binding Path="ShowChildren" />
+											<Binding Path="IsShowingChildren" />
 											<Binding ElementName="RotateGrid" Path="Margin.Left" />
 											<Binding ElementName="RotateGrid" Path="Margin.Right" />
 										</MultiBinding>
@@ -88,14 +114,13 @@
 							VerticalAlignment="Bottom"
 							Background="{DynamicResource DisabledControlNonClickablePartBrush}" />
 					</Grid>
-					<Grid Visibility="{Binding ShowChildren, Converter={StaticResource VisibleIfTrueConverter}}">
+					<Grid Visibility="{Binding IsShowingChildren, Converter={StaticResource VisibleIfTrueConverter}}">
 						<Grid Background="White" Opacity="0.1" />
 						<ItemsControl
-							Height="40"
 							HorizontalAlignment="Right"
 							VerticalAlignment="Bottom"
 							ItemTemplate="{DynamicResource MenuItemDataTemplate}"
-							ItemsSource="{Binding ChildViewModels}" />
+							ItemsSource="{Binding ChildViewModels, UpdateSourceTrigger=PropertyChanged}" />
 					</Grid>
 				</StackPanel>
 				<Border
@@ -123,7 +148,7 @@
 				x:Name="ItemsControl"
 				Focusable="False"
 				ItemTemplate="{StaticResource MenuItemDataTemplate}"
-				ItemsSource="{Binding ViewModels}" />
+				ItemsSource="{Binding ChildViewModels}" />
 		</Grid>
 		<ContentControl
 			Margin="140,0,0,0"

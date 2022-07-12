@@ -9,7 +9,9 @@ namespace FinanceTracker.Converters
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			return new Thickness((int)value + 1 * Double.Parse((string)parameter), 0, 0, 0);
+			var val = (int)value;
+			var ret = new Thickness(((val - 1) * 0.5 + 1) * Double.Parse((string)parameter), 0, 0, 0);
+			return ret;
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
