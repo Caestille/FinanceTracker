@@ -15,7 +15,7 @@ namespace FinanceTracker.Core.ViewModels
 		public string Name
 		{
 			get => name;
-			set => SetProperty(ref name, value);
+			set => SetProperty(ref name, value.TrimStart());
 		}
 
 		private RangeObservableCollection<ViewModelBase> childViewModels = new();
