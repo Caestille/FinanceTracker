@@ -24,5 +24,5 @@ namespace FinanceTracker.Views
 		{
 			InitializeComponent();
 		}
-	}
+    }
 }

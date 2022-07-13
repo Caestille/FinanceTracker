@@ -11,6 +11,9 @@ namespace FinanceTracker.Core.ViewModels
 	{
 		private Func<ViewModelBase> createChildFunc;
 
+		public ICommand SelectCommand => new RelayCommand(Select);
+		public ICommand AddChildCommand => new RelayCommand(AddChild);
+
 		private string name;
 		public string Name
 		{
@@ -53,14 +56,8 @@ namespace FinanceTracker.Core.ViewModels
 			Name = name;
 			createChildFunc = createChild;
 
-			BindCommands();
 			BindMessages();
 		}
-
-		public ICommand SelectCommand => new RelayCommand(Select);
-		public ICommand AddChildCommand => new RelayCommand(AddChild);
-
-		protected virtual void BindCommands() { }
 
 		protected virtual void BindMessages() 
 		{
@@ -92,6 +89,9 @@ namespace FinanceTracker.Core.ViewModels
 			{
 				vm.SetLevel(level + 1);
 			}
+
+			IsShowingChildren = true;
+			ChildViewModels.Last().Select();
 
 			OnPropertyChanged(nameof(ChildViewModels));
 		}

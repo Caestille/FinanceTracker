@@ -5,7 +5,5 @@ namespace FinanceTracker.ViewModels
 	public class BudgetingViewModel : ViewModelBase
 	{
 		public BudgetingViewModel() : base("Budgeting") { }
-
-		protected override void BindCommands() { }
 	}
 }
