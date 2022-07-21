@@ -9,7 +9,19 @@
 
   <ItemGroup>
     <None Remove="Fonts\OpenSans-VariableFont_wdth,wght.ttf" />
+    <None Remove="Images\Barclays.png" />
+    <None Remove="Images\FinanceTrackerIcon.png" />
+    <None Remove="Images\Halifax.png" />
+    <None Remove="Images\HSBC.png" />
+    <None Remove="Images\LloydsTsb.png" />
+    <None Remove="Images\Natwest.png" />
+    <None Remove="Images\Rbs.png" />
+    <None Remove="Images\Santander.png" />
+    <None Remove="Images\SplashScreen.png" />
+    <None Remove="Images\Vanguard.png" />
     <None Remove="ViewModels\MainViewModel.cs~RF556275.TMP" />
+    <None Remove="Views\BankView.xaml~RF4955eb0.TMP" />
+    <None Remove="Views\MainView.xaml.cs~RF486cc38.TMP" />
   </ItemGroup>
 
   <ItemGroup>
@@ -23,14 +35,14 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="CoreUtilities" Version="1.0.23" />
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-beta.300" />
     <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
-    <PackageReference Include="Win10Themables" Version="1.0.31" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\CoreUtilities\CoreUtilities.csproj" />
+    <ProjectReference Include="..\..\Win10Themables\Win10Themables.csproj" />
     <ProjectReference Include="..\FinanceTracker.Core\FinanceTracker.Core.csproj" />
   </ItemGroup>
 
@@ -38,6 +50,32 @@
     <Resource Include="Fonts\OpenSans-VariableFont_wdth,wght.ttf">
       <Pack>True</Pack>
     </Resource>
+    <Resource Include="Images\Barclays.png" />
+    <Resource Include="Images\FinanceTrackerIcon.png" />
+    <Resource Include="Images\Halifax.png" />
+    <Resource Include="Images\Hsbc.png" />
+    <Resource Include="Images\LloydsTsb.png" />
+    <Resource Include="Images\Natwest.png" />
+    <Resource Include="Images\Rbs.png" />
+    <Resource Include="Images\Santander.png" />
+    <Resource Include="Images\Vanguard.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <SplashScreen Include="Images\SplashScreen.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Views\AccountView.xaml.cs">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Update="Views\AccountView.xaml">
+      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
 
 </Project>

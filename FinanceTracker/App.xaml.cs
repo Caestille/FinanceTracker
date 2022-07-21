@@ -1,7 +1,12 @@
-﻿using FinanceTracker.Core.ViewModels;
+﻿using CoreUtilities.Interfaces;
+using CoreUtilities.Services;
+using FinanceTracker.Core.ViewModels;
 using FinanceTracker.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Windows;
 
 namespace FinanceTracker
@@ -13,6 +18,7 @@ namespace FinanceTracker
 	{
 		public static string[]? StartingArgs { get; set; }
 		public static string CrashReportsDirectory => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\FinanceTracker\CrashReports";
+		public static IRegistryService RegistryService = new RegistryService(@"SOFTWARE\FinanceTracker");
 
 		public App()
 		{

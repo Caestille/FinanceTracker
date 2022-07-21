@@ -1,13 +1,21 @@
 ﻿using CoreUtilities.HelperClasses;
+using CoreUtilities.Interfaces;
 using FinanceTracker.Core.Messages;
 using FinanceTracker.Core.ViewModels;
+using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Windows.Input;
 
 namespace FinanceTracker.ViewModels
 {
 	public class MainViewModel : ViewModelBase
 	{
+		public ICommand ToggleMenuOpenCommand => new RelayCommand(ToggleMenuOpen);
+		public ICommand ToggleMenuPinCommand => new RelayCommand(ToggleMenuPin);
+
 		private ViewModelBase visibleViewModel;
 		public ViewModelBase VisibleViewModel
 		{
@@ -22,22 +30,67 @@ namespace FinanceTracker.ViewModels
 			set => SetProperty(ref isMenuPinned, value);
 		}
 
-		private bool isMenuVisible;
-		public bool IsMenuVisible
+		private bool isMenuVisible = true;
+		public bool IsMenuOpen
 		{
 			get => isMenuVisible;
 			set => SetProperty(ref isMenuVisible, value);
 		}
 
+		private string searchText = string.Empty;
+		public string SearchText
+		{
+			get => searchText;
+			set
+			{
+				SetProperty(ref searchText, value);
+				OnPropertyChanged(nameof(FilteredViewModels));
+			}
+		}
+
+		public RangeObservableCollection<ViewModelBase> AllViewModels
+		{
+			get
+			{
+				RangeObservableCollection<ViewModelBase> result = new RangeObservableCollection<ViewModelBase>();
+				this.GetChildren(ref result, true);
+				return result;
+			}
+		}
+
+		public RangeObservableCollection<ViewModelBase> FilteredViewModels
+		{
+			get
+			{
+				return new RangeObservableCollection<ViewModelBase>(AllViewModels.Where(x => x.Name.Contains(SearchText, System.StringComparison.OrdinalIgnoreCase)));
+			}
+		}
+
 		public MainViewModel(List<ViewModelBase> viewModels) : base(string.Empty)
 		{
 			ChildViewModels.AddRange(viewModels);
+
 			SetLevel(0);
 		}
 
 		protected override void BindMessages()
 		{
-			Messenger.Register<ViewModelRequestShowMessage>(this, (sender, message) => { VisibleViewModel = message.ViewModel; });
+			Messenger.Register<ViewModelRequestShowMessage>(this, (sender, message) => 
+			{
+				VisibleViewModel = message.ViewModel;
+				VisibleViewModel.IsSelected = true;
+				SearchText = string.Empty; 
+			});
+		}
+
+		private void ToggleMenuOpen()
+		{
+			IsMenuOpen = !IsMenuOpen;
+		}
+
+		private void ToggleMenuPin()
+		{
+			IsMenuPinned = !IsMenuPinned;
 		}
 	}
 }

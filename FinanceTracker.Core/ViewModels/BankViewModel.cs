@@ -1,7 +1,7 @@
-﻿using CoreUtilities.HelperClasses;
-using Microsoft.Toolkit.Mvvm.ComponentModel;
-using Microsoft.Toolkit.Mvvm.Input;
+﻿using Microsoft.Toolkit.Mvvm.Input;
 using System.Windows.Input;
+using Microsoft.Toolkit.Mvvm.Messaging;
+using FinanceTracker.Core.Messages;
 
 namespace FinanceTracker.Core.ViewModels
 {
@@ -10,7 +10,7 @@ namespace FinanceTracker.Core.ViewModels
 		private const string defaultBankName = "Unnamed Bank";
 
 		public ICommand EditNameCommand => new RelayCommand(EditName);
-		public ICommand NameEditorKeyDownCommand => new RelayCommand<object>(NameEditorKeyDown);
+		public ICommand NameEditorKeyDownCommand => new RelayCommand<object>(NameEditorKeyDown); 
 
 		private bool isEditingName;
 		public bool IsEditingName
@@ -26,7 +26,16 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref temporaryName, value);
 		}
 
-		public BankViewModel(string name) : base(name)
+		public override bool SupportsAddingChildren => false;
+
+		private ViewModelBase visibleAccount;
+		public ViewModelBase VisibleAccount
+		{
+			get => visibleAccount;
+			set => SetProperty(ref visibleAccount, value);
+		}
+
+		public BankViewModel(string name) : base(name, new Func<ViewModelBase>(() => new AccountViewModel("Unnamed Account")))
 		{
 
 		}
@@ -56,6 +65,19 @@ namespace FinanceTracker.Core.ViewModels
 
 				IsEditingName = false;
 			}
+		}
+
+		protected override void BindMessages()
+		{
+			Messenger.Register<AccountViewModelRequestShowMessage>(this, (sender, message) => { VisibleAccount = message.ViewModel; });
+			Messenger.Register<ViewModelRequestDeleteMessage>(this, (sender, message) => 
+			{ 
+				if (ChildViewModels.Contains(message.ViewModel))
+				{
+					ChildViewModels.Remove(message.ViewModel);
+				}
+			});
+			base.BindMessages();
 		}
 	}
 }

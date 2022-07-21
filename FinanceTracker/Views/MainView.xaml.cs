@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.Threading;
+using System.Windows.Controls;
 
 namespace FinanceTracker.Views
 {
@@ -10,6 +11,14 @@ namespace FinanceTracker.Views
 		public MainView()
 		{
 			InitializeComponent();
+			this.Loaded += MainView_Loaded;
+		}
+
+		private async void MainView_Loaded(object sender, System.Windows.RoutedEventArgs e)
+		{
+			await System.Threading.Tasks.Task.Run(() => Thread.Sleep(1000));
+			BlurHost.DrawBlurredElementBackground();
+			this.Loaded -= MainView_Loaded;
 		}
 	}
 }

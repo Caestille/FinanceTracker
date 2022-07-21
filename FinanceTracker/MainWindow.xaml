@@ -11,7 +11,8 @@
 	Height="450"
 	AllowsTransparency="False"
 	FontFamily="{StaticResource OpenSans}"
-	FontSize="13"
+	FontSize="13.1"
+	Icon="Images/FinanceTrackerIcon.png"
 	RenderOptions.BitmapScalingMode="NearestNeighbor"
 	RenderOptions.ClearTypeHint="Enabled"
 	SnapsToDevicePixels="True"
@@ -25,5 +26,5 @@
 	<WindowChrome.WindowChrome>
 		<WindowChrome CaptionHeight="24" ResizeBorderThickness="5" />
 	</WindowChrome.WindowChrome>
-	<controls:MainWindowControl VisibleViewModel="{Binding ElementName=Window, Path=DataContext}"/>
+	<controls:MainWindowControl VisibleViewModel="{Binding ElementName=Window, Path=DataContext}" />
 </Window>

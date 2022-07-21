@@ -2,7 +2,7 @@
 using Microsoft.Toolkit.Mvvm.ComponentModel;
 using Microsoft.Toolkit.Mvvm.Input;
 
-namespace FinanceTracker.Core.Models
+namespace FinanceTracker.Core.ViewModels
 {
 	public class FilterableCheckableItemViewModel : ObservableObject
 	{

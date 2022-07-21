@@ -2,13 +2,13 @@
 
 namespace FinanceTracker.Core.Messages
 {
-	public class ViewModelRequestShowMessage
+	public class ViewModelRequestDeleteMessage
 	{
 		public ViewModelBase ViewModel { get; protected set; }
 
-		public ViewModelRequestShowMessage(ViewModelBase viewModelToShow)
+		public ViewModelRequestDeleteMessage(ViewModelBase viewModelToDelete)
 		{
-			ViewModel = viewModelToShow;
+			ViewModel = viewModelToDelete;
 		}
 	}
 }

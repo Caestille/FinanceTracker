@@ -1,17 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace FinanceTracker.Views
 {
@@ -23,6 +12,37 @@ namespace FinanceTracker.Views
 		public BankView()
 		{
 			InitializeComponent();
+			this.SizeChanged += BankView_SizeChanged;
 		}
-    }
+
+		private void BankView_SizeChanged(object sender, SizeChangedEventArgs e)
+		{
+			var relativePoint = (sender as Visual)?.TransformToAncestor(Application.Current.MainWindow)
+							  .Transform(new Point(0, 0));
+			if (relativePoint == null)
+				return;
+
+			BlurHost.OffsetX = relativePoint.Value.X;
+			BlurHost.DrawBlurredElementBackground();
+
+			if (relativePoint.Value.X > 40)
+			{
+				ShadowGrid.Margin = new Thickness(-1, 0, 0, 0);
+			}
+			else
+			{
+				ShadowGrid.Margin = new Thickness(-35, 0, 0, 0);
+			}
+		}
+
+		private void NameTextbox_IsVisibleChanged(object sender, DependencyPropertyChangedEventArgs e)
+		{
+			var textbox = sender as TextBox;
+			if (textbox != null && (textbox.Visibility == Visibility.Visible))
+			{
+				textbox.Focus();
+				textbox.SelectAll();
+			}
+		}
+	}
 }

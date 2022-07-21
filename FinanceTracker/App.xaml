@@ -1,16 +1,21 @@
 ﻿<Application
-    x:Class="FinanceTracker.App"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:converters="clr-namespace:FinanceTracker.Converters">
-    <Application.Resources>
-        <ResourceDictionary>
-            <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Win10Themables;component/Styles.xaml" />
-            </ResourceDictionary.MergedDictionaries>
+	x:Class="FinanceTracker.App"
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:converters="clr-namespace:FinanceTracker.Converters">
+	<Application.Resources>
+		<ResourceDictionary>
+			<ResourceDictionary.MergedDictionaries>
+				<ResourceDictionary Source="/Win10Themables;component/Styles.xaml" />
+			</ResourceDictionary.MergedDictionaries>
 
-            <FontFamily x:Key="OpenSans">/Fonts/#Open Sans</FontFamily>
-            <converters:LeftPaddingConverter x:Key="LeftPaddingConverter" />
-        </ResourceDictionary>
-    </Application.Resources>
+			<FontFamily x:Key="OpenSans">/Fonts/#Open Sans</FontFamily>
+			<converters:LeftPaddingConverter x:Key="LeftPaddingConverter" />
+			<converters:BankNameIconConverter x:Key="BankNameIconConverter" />
+			<converters:VisibleIfNotNullConverter x:Key="VisibleIfNotNullConverter" />
+			<converters:MultiBoolAndToVisibilityConverter x:Key="MultiBoolAndToVisibilityConverter" />
+			<converters:CurrencyFormatterConverter x:Key="CurrencyFormatterConverter" />
+			<converters:VisibilityInverterConverter x:Key="VisibilityInverterConverter" />
+		</ResourceDictionary>
+	</Application.Resources>
 </Application>
