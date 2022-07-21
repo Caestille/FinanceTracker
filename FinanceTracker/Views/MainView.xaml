@@ -498,7 +498,7 @@
 						Foreground="{DynamicResource TextBrush}"
 						MouseDownColour="Transparent"
 						MouseOverColour="Transparent"
-						Visibility="{Binding IsMenuPinned, Converter={StaticResource VisibleIfFalseConverter}}">
+						Visibility="{Binding IsMenuPinned, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource VisibleIfFalseConverter}}">
 						<!--#region  Button icon-->
 						<Grid Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth}" Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualHeight, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}">
 							<Grid.Background>

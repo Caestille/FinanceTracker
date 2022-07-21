@@ -7,12 +7,17 @@ using Microsoft.Toolkit.Mvvm.Messaging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using System.Windows.Input;
 
 namespace FinanceTracker.ViewModels
 {
 	public class MainViewModel : ViewModelBase
 	{
+		private IRegistryService registryService;
+
+		private const string MenuPinnedSettingName = "MenuPinned";
+
 		public ICommand ToggleMenuOpenCommand => new RelayCommand(ToggleMenuOpen);
 		public ICommand ToggleMenuPinCommand => new RelayCommand(ToggleMenuPin);
 
@@ -27,7 +32,11 @@ namespace FinanceTracker.ViewModels
 		public bool IsMenuPinned
 		{
 			get => isMenuPinned;
-			set => SetProperty(ref isMenuPinned, value);
+			set
+			{
+				SetProperty(ref isMenuPinned, value);
+				registryService.SetSetting(MenuPinnedSettingName, value.ToString());
+			}
 		}
 
 		private bool isMenuVisible = true;
@@ -66,9 +75,18 @@ namespace FinanceTracker.ViewModels
 			}
 		}
 
-		public MainViewModel(List<ViewModelBase> viewModels) : base(string.Empty)
+		public MainViewModel(List<ViewModelBase> viewModels, IRegistryService registryService) : base(string.Empty)
 		{
+			this.registryService = registryService;
+
 			ChildViewModels.AddRange(viewModels);
+
+			//registryService.TryGetSetting(MenuPinnedSettingName, false, out var menuPinned);
+			//if (menuPinned && !IsMenuOpen)
+			//{
+			//	IsMenuOpen = true;
+			//}
+			//IsMenuPinned = menuPinned;
 
 			SetLevel(0);
 		}

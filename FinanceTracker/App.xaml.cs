@@ -18,7 +18,6 @@ namespace FinanceTracker
 	{
 		public static string[]? StartingArgs { get; set; }
 		public static string CrashReportsDirectory => Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) + @"\FinanceTracker\CrashReports";
-		public static IRegistryService RegistryService = new RegistryService(@"SOFTWARE\FinanceTracker");
 
 		public App()
 		{
@@ -55,6 +54,8 @@ namespace FinanceTracker
 				StartingArgs = e.Args;
 			}
 
+			var registryService = new RegistryService(@"SOFTWARE\FinanceTracker");
+
 			var viewModels = new List<ViewModelBase>()
 			{
 				new DashboardViewModel(),
@@ -63,7 +64,7 @@ namespace FinanceTracker
 				new BudgetingViewModel(),
 			};
 
-			var mainViewModel = new MainViewModel(viewModels);
+			var mainViewModel = new MainViewModel(viewModels, registryService);
 			viewModels[0].SelectCommand.Execute(null);
 
 			var mainView = new MainWindow()
