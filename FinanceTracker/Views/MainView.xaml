@@ -2,21 +2,22 @@
 	x:Class="FinanceTracker.Views.MainView"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
 	xmlns:controls="clr-namespace:Win10Themables.Controls;assembly=Win10Themables"
 	xmlns:controls1="clr-namespace:CoreUtilities.Controls;assembly=CoreUtilities"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:views="clr-namespace:FinanceTracker.Views"
-	xmlns:vms="clr-namespace:FinanceTracker.Core.ViewModels;assembly=FinanceTracker.Core" xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
+	xmlns:vms="clr-namespace:FinanceTracker.Core.ViewModels;assembly=FinanceTracker.Core"
 	d:DesignHeight="450"
 	d:DesignWidth="800"
 	mc:Ignorable="d">
-    <b:Interaction.Triggers>
-        <b:EventTrigger EventName="Loaded">
-            <b:InvokeCommandAction Command="{Binding FormLoadedCommand}" />
-        </b:EventTrigger>
-    </b:Interaction.Triggers>
-    <UserControl.Resources>
+	<b:Interaction.Triggers>
+		<b:EventTrigger EventName="Loaded">
+			<b:InvokeCommandAction Command="{Binding FormLoadedCommand}" />
+		</b:EventTrigger>
+	</b:Interaction.Triggers>
+	<UserControl.Resources>
 		<DataTemplate DataType="{x:Type vms:BankViewModel}">
 			<views:BankView />
 		</DataTemplate>
@@ -377,7 +378,7 @@
 			Grid.Column="1"
 			Content="{Binding Path=VisibleViewModel, UpdateSourceTrigger=PropertyChanged}"
 			Focusable="False"
-			Foreground="{DynamicResource TextBrush}" >
+			Foreground="{DynamicResource TextBrush}">
 			<ContentControl.Style>
 				<Style>
 					<Style.Triggers>
@@ -434,12 +435,12 @@
 				<controls1:BlurHost
 					x:Name="Blurrer"
 					BlurBackground="{Binding ElementName=ContentControl}"
+					BlurEnabled="{Binding IsMenuPinned, Converter={StaticResource BoolInverter}}"
 					BlurOpacity="0.5"
 					Focusable="False"
-					PreventResample="{Binding IsMenuOpen, Converter={StaticResource BoolInverter}}"
-					BlurEnabled="{Binding IsMenuPinned, Converter={StaticResource BoolInverter}}"
 					OffsetX="0"
-					OffsetY="30">
+					OffsetY="30"
+					PreventResample="{Binding IsMenuOpen, Converter={StaticResource BoolInverter}}">
 					<controls1:BlurHost.Clip>
 						<RectangleGeometry Rect="0,0,200,10000" />
 					</controls1:BlurHost.Clip>
