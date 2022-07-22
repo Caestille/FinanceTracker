@@ -432,12 +432,12 @@
 			<Grid>
 				<!--#region Background and items host-->
 				<controls1:BlurHost
-					x:Name="BlurHost"
+					x:Name="Blurrer"
 					BlurBackground="{Binding ElementName=ContentControl}"
 					BlurOpacity="0.5"
 					Focusable="False"
-					PreventResample="{Binding IsMenuOpen, Converter={StaticResource BoolInverter}, UpdateSourceTrigger=PropertyChanged}"
-					BlurEnabled="{Binding IsMenuPinned, Converter={StaticResource BoolInverter}, UpdateSourceTrigger=PropertyChanged}"
+					PreventResample="{Binding IsMenuOpen, Converter={StaticResource BoolInverter}}"
+					BlurEnabled="{Binding IsMenuPinned, Converter={StaticResource BoolInverter}}"
 					OffsetX="0"
 					OffsetY="30">
 					<controls1:BlurHost.Clip>
