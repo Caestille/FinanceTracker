@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace FinanceTracker.ViewModels
@@ -20,6 +21,7 @@ namespace FinanceTracker.ViewModels
 
 		public ICommand ToggleMenuOpenCommand => new RelayCommand(ToggleMenuOpen);
 		public ICommand ToggleMenuPinCommand => new RelayCommand(ToggleMenuPin);
+		public ICommand FormLoadedCommand => new RelayCommand(Loaded);
 
 		private ViewModelBase visibleViewModel;
 		public ViewModelBase VisibleViewModel
@@ -81,14 +83,7 @@ namespace FinanceTracker.ViewModels
 
 			ChildViewModels.AddRange(viewModels);
 
-			//registryService.TryGetSetting(MenuPinnedSettingName, false, out var menuPinned);
-			//if (menuPinned && !IsMenuOpen)
-			//{
-			//	IsMenuOpen = true;
-			//}
-			//IsMenuPinned = menuPinned;
-
-			SetLevel(0);
+            SetLevel(0);
 		}
 
 		protected override void BindMessages()
@@ -109,6 +104,16 @@ namespace FinanceTracker.ViewModels
 		private void ToggleMenuPin()
 		{
 			IsMenuPinned = !IsMenuPinned;
+		}
+
+		private void Loaded()
+        {
+			registryService.TryGetSetting(MenuPinnedSettingName, false, out var menuPinned);
+			if (menuPinned && !IsMenuOpen)
+			{
+				IsMenuOpen = true;
+			}
+			IsMenuPinned = menuPinned;
 		}
 	}
 }

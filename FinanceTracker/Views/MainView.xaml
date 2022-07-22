@@ -7,11 +7,16 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:views="clr-namespace:FinanceTracker.Views"
-	xmlns:vms="clr-namespace:FinanceTracker.Core.ViewModels;assembly=FinanceTracker.Core"
+	xmlns:vms="clr-namespace:FinanceTracker.Core.ViewModels;assembly=FinanceTracker.Core" xmlns:b="http://schemas.microsoft.com/xaml/behaviors"
 	d:DesignHeight="450"
 	d:DesignWidth="800"
 	mc:Ignorable="d">
-	<UserControl.Resources>
+    <b:Interaction.Triggers>
+        <b:EventTrigger EventName="Loaded">
+            <b:InvokeCommandAction Command="{Binding FormLoadedCommand}" />
+        </b:EventTrigger>
+    </b:Interaction.Triggers>
+    <UserControl.Resources>
 		<DataTemplate DataType="{x:Type vms:BankViewModel}">
 			<views:BankView />
 		</DataTemplate>
