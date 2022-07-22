@@ -9,14 +9,19 @@
 	mc:Ignorable="d">
 	<Grid>
 		<Label
-            HorizontalContentAlignment="Center"
-            VerticalContentAlignment="Center"
-            Content="Theres nothing here... Add banks via the 'Banks' menu and get connected"
-            FontFamily="{StaticResource OpenSans}"
-            FontWeight="DemiBold"
-            Foreground="{DynamicResource StatusTextBrush}" />
+			HorizontalContentAlignment="Center"
+			VerticalContentAlignment="Center"
+			Content="Theres nothing here... Add banks via the 'Banks' menu and get connected"
+			FontFamily="{StaticResource OpenSans}"
+			FontWeight="DemiBold"
+			Foreground="{DynamicResource StatusTextBrush}" />
 		<Grid>
-			
+			<controls:CircularProgressBar
+				Width="50"
+				Height="50"
+				IsIndeterminate="True"
+				SegmentColor="{DynamicResource ThemeBrush}"
+				StrokeThickness="5" />
 		</Grid>
 	</Grid>
 </UserControl>
