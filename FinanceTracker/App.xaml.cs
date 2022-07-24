@@ -1,5 +1,7 @@
 ﻿using CoreUtilities.Interfaces;
 using CoreUtilities.Services;
+using FinanceTracker.Core.Interfaces;
+using FinanceTracker.Core.Services;
 using FinanceTracker.Core.ViewModels;
 using FinanceTracker.ViewModels;
 using System;
@@ -54,17 +56,19 @@ namespace FinanceTracker
 				StartingArgs = e.Args;
 			}
 
-			var registryService = new RegistryService(@"SOFTWARE\FinanceTracker");
+			IRegistryService appRegistryService = new RegistryService(@"SOFTWARE\FinanceTracker");
+			IRegistryService trueLayerRegistryService = new RegistryService(@"SOFTWARE\TrueLayerApi");
+			IBankApiService bankApiService = new TrueLayerApiService(trueLayerRegistryService); 
 
 			var viewModels = new List<ViewModelBase>()
 			{
 				new DashboardViewModel(),
-				new BanksViewModel(),
+				new BanksViewModel(bankApiService, appRegistryService),
 				new AnalysisViewModel(),
 				new BudgetingViewModel(),
 			};
 
-			var mainViewModel = new MainViewModel(viewModels, registryService);
+			var mainViewModel = new MainViewModel(viewModels, appRegistryService);
 			viewModels[0].SelectCommand.Execute(null);
 
 			var mainView = new MainWindow()

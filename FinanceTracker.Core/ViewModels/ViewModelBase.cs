@@ -14,6 +14,7 @@ namespace FinanceTracker.Core.ViewModels
 
 		public ICommand SelectCommand => new RelayCommand(Select);
 		public ICommand AddChildCommand => new RelayCommand(AddChild);
+		public ICommand RequestDeleteCommand => new RelayCommand(RequestDelete);
 
 		private string name;
 		public string Name
@@ -44,6 +45,13 @@ namespace FinanceTracker.Core.ViewModels
 		}
 
 		public virtual bool SupportsAddingChildren => createChildFunc != null;
+
+		private bool supportsDeleting;
+		public bool SupportsDeleting
+		{
+			get => supportsDeleting;
+			set => SetProperty(ref supportsDeleting, value);
+		}
 
 		private bool isShowingChildren;
 		public bool IsShowingChildren
@@ -88,6 +96,19 @@ namespace FinanceTracker.Core.ViewModels
 			Messenger.Register<BanksUpdatedMessage>(this, (sender, message) =>
 			{
 				BankData = new RangeObservableCollection<BankViewModel>(message.Banks);
+			});
+
+			Messenger.Register<ViewModelRequestDeleteMessage>(this, (sender, message) =>
+			{
+				if (ChildViewModels.Contains(message.ViewModel))
+				{
+					ChildViewModels.Remove(message.ViewModel);
+
+					if (IsShowingChildren && !ChildViewModels.Any())
+					{
+						IsShowingChildren = false;
+					}
+				}
 			});
 		}
 
@@ -154,6 +175,11 @@ namespace FinanceTracker.Core.ViewModels
 			{
 				childVm.GetChildren(ref result, true);
 			}
+		}
+
+		protected virtual void RequestDelete()
+		{
+			Messenger.Send(new ViewModelRequestDeleteMessage(this));
 		}
 	}
 }

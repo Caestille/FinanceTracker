@@ -13,7 +13,6 @@ namespace FinanceTracker.Core.ViewModels
 
 		public ICommand SetVisibleAccountCommand => new RelayCommand(SetVisibleAccount);
 		public ICommand RequestCloseCommand => new RelayCommand(RequestClose);
-		public ICommand RequestDeleteCommand => new RelayCommand(RequestDelete);
 		public ICommand EditNameCommand => new RelayCommand(EditName);
 		public ICommand NameEditorKeyDownCommand => new RelayCommand<object>(NameEditorKeyDown);
 
@@ -45,7 +44,7 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref total, value);
 		}
 
-		public AccountViewModel(string name) : base(name) { }
+		public AccountViewModel(string name) : base(name) { SupportsDeleting = true; }
 
 		private void EditName()
 		{
@@ -82,11 +81,6 @@ namespace FinanceTracker.Core.ViewModels
 		private void RequestClose()
 		{
 			Messenger.Send(new AccountViewModelRequestShowMessage(null));
-		}
-
-		private void RequestDelete()
-		{
-			Messenger.Send(new ViewModelRequestDeleteMessage(this));
 		}
 
 		protected override void Select()

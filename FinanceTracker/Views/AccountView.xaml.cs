@@ -18,6 +18,7 @@ namespace FinanceTracker.Views
 		{
 			if (NameTextbox.Visibility == Visibility.Visible)
 			{
+				NameTextbox.Width = 150;
 				NameTextbox.Focus();
 				NameTextbox.SelectAll();
 			}

@@ -2,15 +2,24 @@
 using System.Windows.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
 using FinanceTracker.Core.Messages;
+using FinanceTracker.Core.Services;
+using FinanceTracker.Core.Interfaces;
+using CoreUtilities.Interfaces;
 
 namespace FinanceTracker.Core.ViewModels
 {
 	public class BankViewModel : ViewModelBase
 	{
+		private IBankApiService truelayerService;
 		private const string defaultBankName = "Unnamed Bank";
+		private Guid bankGuid;
+		private IRegistryService registryService;
 
 		public ICommand EditNameCommand => new RelayCommand(EditName);
-		public ICommand NameEditorKeyDownCommand => new RelayCommand<object>(NameEditorKeyDown); 
+		public ICommand NameEditorKeyDownCommand => new RelayCommand<object>(NameEditorKeyDown);
+		public ICommand CancelTaskCommand => new RelayCommand(CancelTask);
+
+		public ICommand LinkBankCommand => new AsyncRelayCommand(async () => { await LinkBank(); });
 
 		private bool isEditingName;
 		public bool IsEditingName
@@ -35,9 +44,32 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref visibleAccount, value);
 		}
 
-		public BankViewModel(string name) : base(name, new Func<ViewModelBase>(() => new AccountViewModel("Unnamed Account")))
+		private string status;
+		public string Status
 		{
+			get => status;
+			set => SetProperty(ref status, value);
+		}
 
+		private CancellationTokenSource cancellationTokenSource;
+		public CancellationTokenSource CancellationTokenSource
+		{
+			get => cancellationTokenSource;
+			set => SetProperty(ref cancellationTokenSource, value);
+		}
+
+		public BankViewModel(IBankApiService bankApiService, IRegistryService registryService, string name, Guid? guid = null) : base(name, new Func<ViewModelBase>(() => new AccountViewModel("Unnamed Account")))
+		{
+			SupportsDeleting = true;
+
+			this.registryService = registryService;
+			truelayerService = bankApiService;
+			bankGuid = guid ?? Guid.NewGuid();
+			registryService.SetSetting(bankGuid.ToString(), Name, @"\Banks");
+			if (guid != null)
+			{
+				truelayerService.RefreshLink(guid.Value);
+			}
 		}
 
 		private void EditName()
@@ -61,6 +93,7 @@ namespace FinanceTracker.Core.ViewModels
 				if (e.Key == Key.Enter)
 				{
 					Name = TemporaryName;
+					registryService.SetSetting(bankGuid.ToString(), Name, @"\Banks");
 				}
 
 				IsEditingName = false;
@@ -70,14 +103,43 @@ namespace FinanceTracker.Core.ViewModels
 		protected override void BindMessages()
 		{
 			Messenger.Register<AccountViewModelRequestShowMessage>(this, (sender, message) => { VisibleAccount = message.ViewModel; });
-			Messenger.Register<ViewModelRequestDeleteMessage>(this, (sender, message) => 
-			{ 
-				if (ChildViewModels.Contains(message.ViewModel))
-				{
-					ChildViewModels.Remove(message.ViewModel);
-				}
-			});
 			base.BindMessages();
+		}
+
+		protected override void RequestDelete()
+		{
+			registryService.DeleteSetting(bankGuid.ToString(), @"\Banks");
+			truelayerService.DeleteLink(bankGuid);
+			base.RequestDelete();
+		}
+
+		private async Task LinkBank()
+		{
+			if (CancellationTokenSource != null)
+				return;
+
+			CancellationTokenSource = new CancellationTokenSource();
+			Status = "Opening TrueLayer";
+			var result = await truelayerService.LinkBank(bankGuid, cancellationTokenSource.Token);
+			if (!result)
+			{
+				Status = "Cancelled";
+				CancellationTokenSource = null;
+				await Task.Delay(2000);
+			}
+			else
+			{
+				Status = "Success";
+				CancellationTokenSource = null;
+				await Task.Delay(2000);
+			}
+			Status = null;
+			CancellationTokenSource = null;
+		}
+
+		private void CancelTask()
+		{
+			CancellationTokenSource.Cancel();
 		}
 	}
 }

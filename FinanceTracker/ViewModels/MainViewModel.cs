@@ -94,6 +94,14 @@ namespace FinanceTracker.ViewModels
 				VisibleViewModel.IsSelected = true;
 				SearchText = string.Empty; 
 			});
+
+			Messenger.Register<ViewModelRequestDeleteMessage>(this, (sender, message) =>
+			{
+				if (message.ViewModel.IsSelected)
+				{
+					VisibleViewModel = AllViewModels.First(x => x.GetType() == typeof(DashboardViewModel));
+				}
+			});
 		}
 
 		private void ToggleMenuOpen()

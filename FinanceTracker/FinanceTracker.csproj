@@ -5,11 +5,13 @@
     <TargetFramework>net6.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWPF>true</UseWPF>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
     <None Remove="Fonts\OpenSans-VariableFont_wdth,wght.ttf" />
     <None Remove="Images\Barclays.png" />
+    <None Remove="Images\EmptyWallet.png" />
     <None Remove="Images\FinanceTrackerIcon.png" />
     <None Remove="Images\Halifax.png" />
     <None Remove="Images\HSBC.png" />
@@ -51,6 +53,7 @@
       <Pack>True</Pack>
     </Resource>
     <Resource Include="Images\Barclays.png" />
+    <Resource Include="Images\EmptyWallet.png" />
     <Resource Include="Images\FinanceTrackerIcon.png" />
     <Resource Include="Images\Halifax.png" />
     <Resource Include="Images\Hsbc.png" />

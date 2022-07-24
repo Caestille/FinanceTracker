@@ -2,26 +2,34 @@
 	x:Class="FinanceTracker.Views.DashboardView"
 	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-	xmlns:controls="clr-namespace:Win10Themables.Controls;assembly=Win10Themables"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-	xmlns:local="clr-namespace:FinanceTracker.Views"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	mc:Ignorable="d">
 	<Grid>
-		<Label
-			HorizontalContentAlignment="Center"
-			VerticalContentAlignment="Center"
-			Content="Theres nothing here... Add banks via the 'Banks' menu and get connected"
-			FontFamily="{StaticResource OpenSans}"
-			FontWeight="DemiBold"
-			Foreground="{DynamicResource StatusTextBrush}" />
-		<Grid>
-			<controls:CircularProgressBar
-				Width="50"
-				Height="50"
-				IsIndeterminate="True"
-				SegmentColor="{DynamicResource ThemeBrush}"
-				StrokeThickness="5" />
+		<Grid VerticalAlignment="Center">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+				<RowDefinition Height="Auto" />
+			</Grid.RowDefinitions>
+			<Image Width="150" Source="/Images/EmptyWallet.png" />
+			<Label
+				Grid.Row="1"
+				HorizontalContentAlignment="Center"
+				VerticalContentAlignment="Center"
+				Content="Theres nothing here..."
+				FontFamily="{StaticResource OpenSans}"
+				FontWeight="DemiBold"
+				Foreground="{DynamicResource StatusTextBrush}" />
+			<Label
+				Grid.Row="2"
+				HorizontalContentAlignment="Center"
+				VerticalContentAlignment="Center"
+				Content="Add banks via the 'Banks' menu and link a bank, or import data manually"
+				FontFamily="{StaticResource OpenSans}"
+				FontWeight="DemiBold"
+				Foreground="{DynamicResource StatusTextBrush}" />
 		</Grid>
+		<Grid />
 	</Grid>
 </UserControl>

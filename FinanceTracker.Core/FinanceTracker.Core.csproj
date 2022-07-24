@@ -1,10 +1,15 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0-windows</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Services\LiveAuthLink.txt" />
+  </ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-beta.300" />
@@ -15,6 +20,10 @@
 
 	<ItemGroup>
 	  <ProjectReference Include="..\..\CoreUtilities\CoreUtilities.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Services\LiveAuthLink.txt" />
 	</ItemGroup>
 
 </Project>

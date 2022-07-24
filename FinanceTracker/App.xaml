@@ -14,6 +14,7 @@
 			<converters:BankNameIconConverter x:Key="BankNameIconConverter" />
 			<converters:VisibleIfNotNullConverter x:Key="VisibleIfNotNullConverter" />
 			<converters:MultiBoolAndToVisibilityConverter x:Key="MultiBoolAndToVisibilityConverter" />
+			<converters:MultiBoolOrToVisibilityConverter x:Key="MultiBoolOrToVisibilityConverter" />
 			<converters:CurrencyFormatterConverter x:Key="CurrencyFormatterConverter" />
 			<converters:VisibilityInverterConverter x:Key="VisibilityInverterConverter" />
 		</ResourceDictionary>

@@ -1,14 +1,17 @@
 ﻿using CoreUtilities.HelperClasses;
+using CoreUtilities.Interfaces;
+using FinanceTracker.Core.Interfaces;
 using FinanceTracker.Core.Messages;
+using FinanceTracker.Core.Services;
 using FinanceTracker.Core.ViewModels;
+using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
+using System.Windows.Input;
 
 namespace FinanceTracker.Core.ViewModels
 {
 	public class BanksViewModel : ViewModelBase
 	{
-		public BanksViewModel() : base("Banks", new Func<ViewModelBase>(() => new BankViewModel("Unnamed Bank"))) { }
-
 		public override RangeObservableCollection<BankViewModel> BankData 
 		{ 
 			get => new RangeObservableCollection<BankViewModel>(ChildViewModels.Select(x => (BankViewModel)x)); 
@@ -17,6 +20,18 @@ namespace FinanceTracker.Core.ViewModels
 				ChildViewModels.Clear();
 				ChildViewModels.AddRange(value);
 			}
+		}
+
+		public BanksViewModel(IBankApiService bankApiService, IRegistryService registryService)
+			: base("Banks", new Func<ViewModelBase>(
+				() => new BankViewModel(bankApiService, registryService, "Unnamed Bank"))) 
+		{
+			var existingBanks = registryService.GetAllSettingsInPath(@"\Banks");
+			foreach (var kvp in existingBanks)
+			{
+				ChildViewModels.Add(new BankViewModel(bankApiService, registryService, kvp.Value.ToString(), Guid.Parse(kvp.Key)));
+			}
+			NotifyBanksChanged();
 		}
 
 		protected override void AddChild()

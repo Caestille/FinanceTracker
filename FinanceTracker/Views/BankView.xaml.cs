@@ -18,7 +18,8 @@ namespace FinanceTracker.Views
 		private void BankView_SizeChanged(object sender, SizeChangedEventArgs e)
 		{
 			var relativePoint = (sender as Visual)?.TransformToAncestor(Application.Current.MainWindow)
-							  .Transform(new Point(0, 0));
+				.Transform(new Point(0, 0));
+
 			if (relativePoint == null)
 				return;
 
@@ -40,6 +41,7 @@ namespace FinanceTracker.Views
 			var textbox = sender as TextBox;
 			if (textbox != null && (textbox.Visibility == Visibility.Visible))
 			{
+				textbox.Width = 150;
 				textbox.Focus();
 				textbox.SelectAll();
 			}

@@ -166,7 +166,7 @@
 							</Border.Effect>
 						</Border>
 						<!--#endregion-->
-						<!--#region Menu item contents-->
+						<!--#region Menu item content-->
 						<Grid>
 							<Grid.ColumnDefinitions>
 								<ColumnDefinition Width="Auto" />
@@ -196,7 +196,7 @@
 								IsHitTestVisible="False" />
 						</Grid>
 						<!--#endregion-->
-						<!--#region Add child button button-->
+						<!--#region Add child button-->
 						<controls:ExtendedButton
 							Width="20"
 							Height="{Binding RelativeSource={RelativeSource Self}, Path=Width}"
@@ -276,12 +276,65 @@
 								Y2="2.5" />
 						</Grid>
 						<!--#endregion-->
+						<!--#region Delete button-->
+						<controls:ExtendedButton
+							Visibility="{Binding SupportsDeleting, Converter={StaticResource VisibleIfTrueConverter}}"
+							Width="20"
+							Height="{Binding RelativeSource={RelativeSource Self}, Path=Width}"
+							Margin="10,0"
+							Opacity="0.7"
+							HorizontalAlignment="Right"
+							VerticalAlignment="Center"
+							Background="{DynamicResource ControlClickablePartBrush}"
+							BorderThickness="0"
+							Command="{Binding RequestDeleteCommand}"
+							CornerRadius="12.5"
+							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
+							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
+							ToolTip="Delete">
+							<controls:ExtendedButton.Style>
+								<Style TargetType="{x:Type controls:ExtendedButton}">
+									<Style.Triggers>
+										<Trigger Property="IsMouseOver" Value="False">
+											<Setter Property="Background" Value="White" />
+										</Trigger>
+									</Style.Triggers>
+								</Style>
+							</controls:ExtendedButton.Style>
+							<Grid>
+								<Border
+									Width="8"
+									Height="9"
+									Margin="0,5,0,0"
+									BorderBrush="{DynamicResource StatusTextBrush}"
+									Background="{DynamicResource StatusTextBrush}"
+									BorderThickness="2"
+									CornerRadius="0,0,1,1" />
+								<Border
+									Width="12"
+									Height="2"
+									Margin="0,2,0,0"
+									VerticalAlignment="Top"
+									BorderBrush="{DynamicResource StatusTextBrush}"
+									BorderThickness="2"
+									CornerRadius="0,0,3,3" />
+								<Border
+									Width="4"
+									Height="2"
+									Margin="0,0,0,0"
+									VerticalAlignment="Top"
+									BorderBrush="{DynamicResource StatusTextBrush}"
+									BorderThickness="2"
+									CornerRadius="0,0,3,3" />
+							</Grid>
+						</controls:ExtendedButton>
+						<!--#endregion-->
 						<!--#region Selection indicator-->
 						<Border
 							Width="6"
 							Margin="0,3,0,4"
 							HorizontalAlignment="Left"
-							Background="{DynamicResource ThemeMouseOverBrush}"
+							Background="{DynamicResource ThemeBrush}"
 							CornerRadius="0,5,5,0"
 							Visibility="{Binding IsSelected, Converter={StaticResource VisibleIfTrueConverter}, UpdateSourceTrigger=PropertyChanged}" />
 						<!--#endregion-->

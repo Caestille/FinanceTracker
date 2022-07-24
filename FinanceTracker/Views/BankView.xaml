@@ -14,6 +14,7 @@
 		<DataTemplate DataType="{x:Type vms:AccountViewModel}">
 			<local:AccountView />
 		</DataTemplate>
+		<!--#region Account item template-->
 		<DataTemplate x:Key="AccountItemTemplate" DataType="{x:Type vms:AccountViewModel}">
 			<controls:ExtendedButton
 				x:Name="Button"
@@ -45,6 +46,7 @@
 						<RowDefinition Height="Auto" />
 					</Grid.RowDefinitions>
 					<Label
+						Width="Auto"
 						Margin="6,0"
 						Content="{Binding Name}"
 						FontSize="15"
@@ -136,111 +138,257 @@
 				</Grid>
 			</controls:ExtendedButton>
 		</DataTemplate>
+		<!--#endregion-->
+		<!--#region Bank control template (for blur host to be able to see all-->
 		<DataTemplate x:Key="BankControlTemplate" DataType="{x:Type vms:BankViewModel}">
 			<Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-				<Grid.ColumnDefinitions>
-					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition Width="Auto" />
-					<ColumnDefinition Width="*" />
-				</Grid.ColumnDefinitions>
 				<Grid.RowDefinitions>
+					<RowDefinition Height="Auto" />
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="Auto" />
 					<RowDefinition Height="*" />
 				</Grid.RowDefinitions>
-				<Image
-					Grid.Row="0"
-					Grid.Column="0"
-					Height="30"
-					MaxWidth="30"
-					Margin="15,5,0,5"
-					Source="{Binding Name, Converter={StaticResource BankNameIconConverter}}"
-					Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Source, Converter={StaticResource VisibleIfNotNullConverter}}" />
-				<Label
-					x:Name="NameLabel"
-					Grid.Row="0"
-					Grid.Column="1"
-					MinWidth="100"
-					Margin="10,5"
-					VerticalAlignment="Top"
-					Content="{Binding Name}"
-					FontSize="20"
-					FontWeight="Bold"
-					Foreground="{DynamicResource TextBrush}" />
-				<TextBox
-					x:Name="NameTextbox"
-					Grid.Row="0"
-					Grid.Column="1"
-					Width="{Binding ElementName=NameLabel, Path=ActualWidth}"
-					MinWidth="100"
-					Margin="13,10,6,0"
-					HorizontalAlignment="Left"
-					VerticalAlignment="Top"
-					Background="{DynamicResource MainBackgroundBrush}"
-					BorderBrush="{DynamicResource TextBrush}"
-					BorderThickness="0,0,0,1"
-					FontSize="20"
-					FontWeight="Bold"
-					Foreground="{DynamicResource TextBrush}"
-					IsVisibleChanged="NameTextbox_IsVisibleChanged"
-					Text="{Binding TemporaryName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-					Visibility="{Binding IsEditingName, Converter={StaticResource VisibleIfTrueConverter}}">
-					<b:Interaction.Triggers>
-						<b:EventTrigger EventName="PreviewKeyDown">
-							<b:InvokeCommandAction Command="{Binding NameEditorKeyDownCommand}" PassEventArgsToCommand="True" />
-						</b:EventTrigger>
-					</b:Interaction.Triggers>
-				</TextBox>
-				<controls:ExtendedButton
-					x:Name="Button"
-					Grid.Row="0"
-					Grid.Column="2"
-					Width="18"
-					Height="{Binding RelativeSource={RelativeSource Self}, Path=Width}"
-					Margin="0,7,0,3"
-					HorizontalAlignment="Left"
-					VerticalAlignment="Center"
-					Background="{DynamicResource ControlNonClickablePartBrush}"
-					BorderThickness="0"
-					Command="{Binding EditNameCommand}"
-					CornerRadius="5"
-					Foreground="{DynamicResource TextBrush}"
-					MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
-					MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
-					ToolTip="Edit Name">
+				<Grid Grid.Row="0">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="Auto" />
+						<ColumnDefinition Width="*" />
+					</Grid.ColumnDefinitions>
+					<Image
+						Grid.Row="0"
+						Grid.Column="0"
+						Height="30"
+						MaxWidth="30"
+						Margin="15,5,0,5"
+						Source="{Binding Name, Converter={StaticResource BankNameIconConverter}}"
+						Visibility="{Binding RelativeSource={RelativeSource Self}, Path=Source, Converter={StaticResource VisibleIfNotNullConverter}}" />
+					<Label
+						x:Name="NameLabel"
+						Grid.Row="0"
+						Grid.Column="1"
+						Margin="10,5"
+						VerticalAlignment="Top"
+						Content="{Binding Name}"
+						FontSize="20"
+						FontWeight="Bold"
+						Foreground="{DynamicResource TextBrush}"
+						Visibility="{Binding ElementName=NameTextbox, Path=Visibility, Converter={StaticResource VisibilityInverterConverter}}" />
+					<TextBox
+						x:Name="NameTextbox"
+						Grid.Row="0"
+						Grid.Column="1"
+						Width="{Binding ElementName=NameLabel, Path=ActualWidth}"
+						Margin="13,10,6,9"
+						HorizontalAlignment="Left"
+						VerticalAlignment="Top"
+						Background="{DynamicResource MainBackgroundBrush}"
+						BorderBrush="{DynamicResource TextBrush}"
+						BorderThickness="0,0,0,1"
+						FontSize="20"
+						FontWeight="Bold"
+						Foreground="{DynamicResource TextBrush}"
+						IsVisibleChanged="NameTextbox_IsVisibleChanged"
+						Text="{Binding TemporaryName, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+						Visibility="{Binding IsEditingName, Converter={StaticResource VisibleIfTrueConverter}}">
+						<b:Interaction.Triggers>
+							<b:EventTrigger EventName="PreviewKeyDown">
+								<b:InvokeCommandAction Command="{Binding NameEditorKeyDownCommand}" PassEventArgsToCommand="True" />
+							</b:EventTrigger>
+						</b:Interaction.Triggers>
+					</TextBox>
+					<controls:ExtendedButton
+						x:Name="RenameButton"
+						Grid.Row="0"
+						Grid.Column="2"
+						Width="18"
+						Height="{Binding RelativeSource={RelativeSource Self}, Path=Width}"
+						Margin="0,7,0,3"
+						HorizontalAlignment="Left"
+						VerticalAlignment="Center"
+						Background="{DynamicResource ControlNonClickablePartBrush}"
+						BorderThickness="0"
+						Command="{Binding EditNameCommand}"
+						CornerRadius="5"
+						MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
+						MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
+						ToolTip="Edit name">
+						<!--#region Button icon-->
+						<Grid
+							Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}"
+							Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualHeight, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}"
+							Margin="-1,0,0,0">
+							<Line
+								Stroke="{DynamicResource StatusTextBrush}"
+								StrokeEndLineCap="Triangle"
+								StrokeThickness="4"
+								X1="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-4}"
+								X2="3"
+								Y1="4"
+								Y2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualHeight, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}" />
+							<Line
+								Stroke="{DynamicResource StatusTextBrush}"
+								StrokeThickness="4"
+								X1="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-1}"
+								X2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}"
+								Y1="1"
+								Y2="3" />
+						</Grid>
+						<!--#endregion-->
+					</controls:ExtendedButton>
+					<!--#region Data import/linking controls-->
 					<Grid
-						Width="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}"
-						Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualHeight, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}"
-						Margin="-1,0,0,0">
-						<Line
-							Stroke="{DynamicResource StatusTextBrush}"
-							StrokeEndLineCap="Triangle"
-							StrokeThickness="4"
-							X1="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-4}"
-							X2="3"
-							Y1="4"
-							Y2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualHeight, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}" />
-						<Line
-							Stroke="{DynamicResource StatusTextBrush}"
-							StrokeThickness="4"
-							X1="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-1}"
-							X2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}"
-							Y1="1"
-							Y2="3" />
+						Grid.Column="3"
+						Margin="10,0"
+						HorizontalAlignment="Right">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+						<Label
+							Margin="0,3,0,0"
+							HorizontalContentAlignment="Center"
+							VerticalContentAlignment="Center"
+							Content="{Binding Status}"
+							FontFamily="{StaticResource OpenSans}"
+							FontWeight="Light"
+							Foreground="{DynamicResource StatusTextBrush}"
+							Visibility="{Binding Status, Converter={StaticResource StringNotEmptyVisibilityConverter}}" />
+						<controls:ExtendedButton
+							Grid.Column="1"
+							Margin="0,6,0,3"
+							Padding="6,3"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Center"
+							Background="{DynamicResource ControlNonClickablePartBrush}"
+							BorderThickness="0"
+							Command="{Binding LinkBankCommand}"
+							CornerRadius="5"
+							Foreground="{DynamicResource StatusTextBrush}"
+							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
+							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
+							ToolTip="Link bank using TrueLayer (opens in browser)">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto" />
+									<ColumnDefinition Width="Auto" />
+								</Grid.ColumnDefinitions>
+								<Label
+									Margin="0"
+									Padding="0"
+									Content="Link bank"
+									Foreground="{DynamicResource TextBrush}" />
+								<controls:ExtendedButton
+									Grid.Column="6"
+									Width="16"
+									Height="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}"
+									Margin="6,0,0,0"
+									Padding="-3,-3"
+									VerticalAlignment="Center"
+									Background="{DynamicResource ControlClickablePartBrush}"
+									BorderThickness="0"
+									Command="{Binding CancelTaskCommand}"
+									CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+									Foreground="{DynamicResource StatusTextBrush}"
+									MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
+									MouseOverColour="{DynamicResource StatusTextBrush}"
+									ToolTip="Cancel"
+									Visibility="{Binding CancellationTokenSource, Converter={StaticResource VisibleIfNotNullConverter}}">
+									<Grid
+										Width="6"
+										Height="6"
+										HorizontalAlignment="Center"
+										VerticalAlignment="Center">
+										<Line
+											Stroke="{DynamicResource TextBrush}"
+											StrokeThickness="1"
+											X1="0"
+											X2="6"
+											Y1="0"
+											Y2="6" />
+										<Line
+											Stroke="{DynamicResource TextBrush}"
+											StrokeThickness="1"
+											X1="0"
+											X2="6"
+											Y1="6"
+											Y2="0" />
+									</Grid>
+								</controls:ExtendedButton>
+								<controls:CircularProgressBar
+									Grid.Column="1"
+									Width="20"
+									Height="20"
+									Margin="5,-5,0,-5"
+									HorizontalAlignment="Center"
+									VerticalAlignment="Center"
+									IsHitTestVisible="False"
+									IsIndeterminate="True"
+									SegmentColor="{DynamicResource ThemeMouseOverBrush}"
+									StrokeThickness="3"
+									Visibility="{Binding Status, Converter={StaticResource StringNotEmptyVisibilityConverter}}" />
+							</Grid>
+						</controls:ExtendedButton>
+
+						<controls:ExtendedButton
+							Grid.Column="3"
+							Margin="0,6,0,3"
+							Padding="6,3"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Center"
+							Background="{DynamicResource ControlNonClickablePartBrush}"
+							BorderThickness="0"
+							CornerRadius="5"
+							Foreground="{DynamicResource StatusTextBrush}"
+							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
+							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
+							ToolTip="Link bank using TrueLayer (opens in browser)">
+							<Grid>
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto" />
+									<ColumnDefinition Width="Auto" />
+								</Grid.ColumnDefinitions>
+								<Label
+									Margin="0"
+									Padding="0"
+									Content="Import data"
+									Foreground="{DynamicResource TextBrush}" />
+								<controls:CircularProgressBar
+									Grid.Column="1"
+									Width="20"
+									Height="20"
+									Margin="5,-5,0,-5"
+									HorizontalAlignment="Center"
+									VerticalAlignment="Center"
+									IsHitTestVisible="False"
+									IsIndeterminate="True"
+									SegmentColor="{DynamicResource ThemeMouseOverBrush}"
+									StrokeThickness="3"
+									Visibility="Collapsed" />
+							</Grid>
+						</controls:ExtendedButton>
+						<Border
+							Grid.Column="2"
+							Width="1"
+							Margin="10,10,10,6"
+							HorizontalAlignment="Left"
+							Background="{DynamicResource StatusTextBrush}" />
 					</Grid>
-				</controls:ExtendedButton>
+					<!--#endregion-->
+				</Grid>
+				<!--#region Title separator-->
 				<Border
 					Grid.Row="1"
-					Grid.ColumnSpan="3"
 					Height="1"
 					Margin="10,0"
 					HorizontalAlignment="Stretch"
 					VerticalAlignment="Top"
 					Background="{DynamicResource StatusTextBrush}" />
-				<Grid
-					Grid.Row="2"
-					Grid.ColumnSpan="3"
-					VerticalAlignment="Stretch">
+				<!--#endregion-->
+				<Grid Grid.Row="2" VerticalAlignment="Stretch">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto" />
 						<ColumnDefinition Width="*" />
@@ -250,7 +398,6 @@
 						<RowDefinition Height="*" />
 					</Grid.RowDefinitions>
 					<Label
-						Grid.Row="0"
 						Grid.Column="0"
 						Margin="10,5"
 						VerticalAlignment="Top"
@@ -258,78 +405,69 @@
 						FontSize="15"
 						FontWeight="Bold"
 						Foreground="{DynamicResource TextBrush}" />
-					<!--#region Add child button background-->
-					<Border
-						x:Name="Border"
-						Grid.Row="0"
+					<!--#region Add child button-->
+					<controls:ExtendedButton
 						Grid.Column="1"
 						Width="20"
-						Height="{Binding ElementName=Border, Path=Width}"
+						Height="{Binding RelativeSource={RelativeSource Self}, Path=Width}"
+						Margin="0,2,32,0"
 						HorizontalAlignment="Left"
+						HorizontalContentAlignment="Stretch"
+						VerticalContentAlignment="Stretch"
 						Background="{DynamicResource ControlClickablePartBrush}"
-						CornerRadius="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
-						Opacity="0.7" />
-					<!--#endregion-->
-					<!--#region Add child button button and contents-->
-					<Grid
-						Grid.Row="0"
-						Grid.Column="1"
-						Width="{Binding ElementName=Border, Path=Width}"
-						Height="{Binding ElementName=Border, Path=Width}"
-						Margin="{Binding ElementName=Border, Path=Margin}"
-						HorizontalAlignment="Left">
-						<controls:ExtendedButton
-							Background="Transparent"
-							BorderThickness="0"
-							Command="{Binding AddChildCommand}"
-							CornerRadius="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
-							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
-							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
-							Opacity="0.5"
-							ToolTip="Add Account" />
-						<Grid Opacity="0.4">
+						BorderThickness="0"
+						Command="{Binding AddChildCommand}"
+						CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+						MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
+						MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
+						Opacity="0.7"
+						SnapsToDevicePixels="True"
+						ToolTip="Add new account">
+						<!--#region Button icon-->
+						<Grid Margin="-1">
 							<Line
-								x:Name="Line1"
 								IsHitTestVisible="False"
-								Stroke="{DynamicResource TextBrush}"
+								Stroke="{DynamicResource StatusTextBrush}"
 								StrokeThickness="2"
-								X1="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
-								X2="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+								X1="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+								X2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
 								Y1="3"
-								Y2="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}" />
+								Y2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}" />
 							<Line
 								IsHitTestVisible="False"
-								Stroke="{Binding ElementName=Line1, Path=Stroke}"
-								StrokeThickness="{Binding ElementName=Line1, Path=StrokeThickness}"
+								Stroke="{DynamicResource StatusTextBrush}"
+								StrokeThickness="2"
 								X1="3"
-								X2="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}"
-								Y1="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
-								Y2="{Binding ElementName=Border, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}" />
+								X2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}"
+								Y1="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+								Y2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}" />
 						</Grid>
-					</Grid>
+						<!--#endregion-->
+					</controls:ExtendedButton>
 					<!--#endregion-->
-					<ItemsControl
-						x:Name="ItemsControl"
-						Grid.Row="2"
-						Grid.ColumnSpan="2"
-						ItemTemplate="{StaticResource AccountItemTemplate}"
-						ItemsSource="{Binding ChildViewModels}">
-						<ItemsControl.ItemsPanel>
-							<ItemsPanelTemplate>
-								<WrapPanel Width="{Binding ElementName=ItemsControl, Path=ActualWidth}" Orientation="Vertical" />
-							</ItemsPanelTemplate>
-						</ItemsControl.ItemsPanel>
-					</ItemsControl>
 				</Grid>
+				<ItemsControl
+					x:Name="ItemsControl"
+					Grid.Row="3"
+					ItemTemplate="{StaticResource AccountItemTemplate}"
+					ItemsSource="{Binding ChildViewModels}">
+					<ItemsControl.ItemsPanel>
+						<ItemsPanelTemplate>
+							<WrapPanel Width="{Binding ElementName=ItemsControl, Path=ActualWidth}" Orientation="Vertical" />
+						</ItemsPanelTemplate>
+					</ItemsControl.ItemsPanel>
+				</ItemsControl>
 			</Grid>
 		</DataTemplate>
+		<!--#endregion-->
 	</UserControl.Resources>
-	<Grid x:Name="RootGrid" Focusable="False">
+	<Grid Focusable="False">
 		<ContentControl
 			x:Name="ContentControl"
 			Content="{Binding RelativeSource={RelativeSource Self}, Path=DataContext}"
 			ContentTemplate="{StaticResource BankControlTemplate}"
 			Focusable="False" />
+		<!--#region Overlaid account view host-->
 		<Grid
 			Grid.RowSpan="3"
 			Grid.ColumnSpan="3"
@@ -341,8 +479,13 @@
 				Margin="-35,0,0,0"
 				Background="Black"
 				Focusable="False"
-				Opacity="0.3"
-				Visibility="{Binding VisibleAccount, Converter={StaticResource VisibleIfNotNullConverter}}" />
+				Opacity="0.4">
+				<Grid.Visibility>
+					<MultiBinding Converter="{StaticResource MultiBoolOrToVisibilityConverter}">
+						<Binding Converter="{StaticResource IsNotNullConverter}" Path="VisibleAccount" />
+					</MultiBinding>
+				</Grid.Visibility>
+			</Grid>
 			<Border Focusable="False" Visibility="{Binding VisibleAccount, Converter={StaticResource VisibleIfNotNullConverter}}">
 				<Border.OpacityMask>
 					<VisualBrush Visual="{Binding ElementName=Border1}" />
@@ -355,7 +498,7 @@
 				</Border.Effect>
 				<Border
 					x:Name="Border1"
-					Margin="20"
+					Margin="15"
 					Background="{DynamicResource MainBackgroundBrush}"
 					CornerRadius="5"
 					Focusable="False">
@@ -371,5 +514,6 @@
 				</Border>
 			</Border>
 		</Grid>
+		<!--#endregion-->
 	</Grid>
 </UserControl>
