@@ -212,6 +212,7 @@
 							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
 							Opacity="0.7"
 							SnapsToDevicePixels="True"
+							ToolTip="Add"
 							Visibility="{Binding SupportsAddingChildren, Converter={StaticResource VisibleIfTrueConverter}}">
 							<!--#region Button icon-->
 							<Grid Margin="-1">

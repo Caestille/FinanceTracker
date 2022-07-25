@@ -70,7 +70,7 @@ namespace FinanceTracker.Core.ViewModels
 			registryService.SetSetting(bankGuid.ToString(), Name, @"\Banks");
 			if (guid != null)
 			{
-				truelayerService.RefreshLink(guid.Value);
+				truelayerService.ReloadLink(guid.Value);
 			}
 		}
 
@@ -118,14 +118,14 @@ namespace FinanceTracker.Core.ViewModels
 
 		protected override void RequestDelete()
 		{
-			registryService.DeleteSetting(bankGuid.ToString(), @"\Banks");
 			truelayerService.DeleteLink(bankGuid);
+			registryService.DeleteSetting(bankGuid.ToString(), @"\Banks");
 			base.RequestDelete();
 		}
 
 		private async Task LinkBank()
 		{
-			if (CancellationTokenSource != null)
+			if (LinkStatus != BankLinkStatus.NotLinked)
 				return;
 
 			CancellationTokenSource = new CancellationTokenSource();

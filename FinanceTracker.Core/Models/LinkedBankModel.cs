@@ -5,7 +5,7 @@ namespace FinanceTracker.Core.Models
 {
     public enum BankLinkStatus
     {
-		[Description("Link Bank")]
+		[Description("Link bank")]
         NotLinked,
 
         [Description("Linking")]
@@ -17,7 +17,7 @@ namespace FinanceTracker.Core.Models
         [Description("Linked")]
         LinkVerified,
 
-        [Description("Link Broken")]
+        [Description("Link broken")]
         LinkBroken
     }
 

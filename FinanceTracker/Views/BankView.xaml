@@ -288,7 +288,7 @@
 									Background="LimeGreen"
 									BorderThickness="0"
 									CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
-									ToolTip="Bank linked"
+									ToolTip="TrueLayer API poll successful"
 									Visibility="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterVisibilityConverter}, ConverterParameter={x:Static models:BankLinkStatus.LinkVerified}}">
 									<Grid
 										Width="6"
@@ -296,16 +296,16 @@
 										HorizontalAlignment="Center"
 										VerticalAlignment="Center">
 										<Line
-											Stroke="{DynamicResource TextBrush}"
+											Stroke="White"
 											StrokeThickness="1"
-											X1="4"
-											X2="3"
-											Y1="0"
+											X1="0"
+											X2="2"
+											Y1="3"
 											Y2="6" />
 										<Line
-											Stroke="{DynamicResource TextBrush}"
+											Stroke="White"
 											StrokeThickness="1"
-											X1="3"
+											X1="2"
 											X2="6"
 											Y1="6"
 											Y2="0" />
@@ -322,7 +322,7 @@
 									Background="Red"
 									BorderThickness="0"
 									CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
-									ToolTip="Bank linked"
+									ToolTip="TrueLayer API poll failed"
 									Visibility="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterVisibilityConverter}, ConverterParameter={x:Static models:BankLinkStatus.LinkBroken}}">
 									<Grid
 										Width="6"
@@ -330,14 +330,14 @@
 										HorizontalAlignment="Center"
 										VerticalAlignment="Center">
 										<Line
-											Stroke="{DynamicResource TextBrush}"
+											Stroke="White"
 											StrokeThickness="1"
 											X1="0"
 											X2="6"
 											Y1="0"
 											Y2="6" />
 										<Line
-											Stroke="{DynamicResource TextBrush}"
+											Stroke="White"
 											StrokeThickness="1"
 											X1="0"
 											X2="6"
@@ -358,7 +358,6 @@
 									BorderThickness="0"
 									Command="{Binding CancelTaskCommand}"
 									CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
-									Foreground="{DynamicResource StatusTextBrush}"
 									MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
 									MouseOverColour="{DynamicResource StatusTextBrush}"
 									ToolTip="Cancel"
@@ -391,7 +390,7 @@
 									Grid.Column="1"
 									Width="20"
 									Height="20"
-									Margin="5,-5,0,-5"
+									Margin="6,-5,0,-5"
 									HorizontalAlignment="Center"
 									VerticalAlignment="Center"
 									IsHitTestVisible="False"
@@ -475,13 +474,13 @@
 						HorizontalAlignment="Left"
 						HorizontalContentAlignment="Stretch"
 						VerticalContentAlignment="Stretch"
-						Background="{DynamicResource ControlClickablePartBrush}"
+						Background="{DynamicResource ControlNonClickablePartBrush}"
 						BorderThickness="0"
 						Command="{Binding AddChildCommand}"
 						CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
 						MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
 						MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
-						Opacity="0.7"
+						Opacity="1"
 						SnapsToDevicePixels="True"
 						ToolTip="Add new account">
 						<!--#region Button icon-->

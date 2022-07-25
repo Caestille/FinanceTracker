@@ -8,8 +8,8 @@ namespace FinanceTracker.Core.Interfaces
 
 		Task<bool> LinkBank(Guid bankGuid, CancellationToken token);
 
-		void RefreshLink(Guid bankGuid);
+		void ReloadLink(Guid bankGuid);
 
-		void DeleteLink(Guid bankGuid);
+		Task DeleteLink(Guid bankGuid);
 	}
 }
