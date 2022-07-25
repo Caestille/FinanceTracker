@@ -70,7 +70,7 @@ namespace FinanceTracker.Core.ViewModels
 			registryService.SetSetting(bankGuid.ToString(), Name, @"\Banks");
 			if (guid != null)
 			{
-				truelayerService.ReloadLink(guid.Value);
+				truelayerService.ReloadBankLinkDetails(guid.Value);
 			}
 		}
 

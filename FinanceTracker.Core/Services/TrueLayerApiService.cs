@@ -46,7 +46,7 @@ namespace FinanceTracker.Core.Services
                 UseShellExecute = true,
             });
 
-            (bool success, string authCode) = await ListenForAuthorisationCode(bankGuid, token);
+            (bool success, string authCode) = await ListenForAuthorisationCode(token);
 
             if (!success)
             {
@@ -74,7 +74,7 @@ namespace FinanceTracker.Core.Services
             return success;
         }
 
-		public void ReloadLink(Guid bankGuid)
+		public void ReloadBankLinkDetails(Guid bankGuid)
 		{
             var linkedBank = new LinkedBankModel(registryService, bankGuid);
             linkedBank.NewBankLinkStatus += LinkedBank_NewBankLinkStatus;
@@ -94,9 +94,6 @@ namespace FinanceTracker.Core.Services
 
             var success = response.StatusCode == HttpStatusCode.OK;
 
-            //if (!success)
-            //    return;
-
 			registryService.DeleteSubTree(@$"\{bankGuid}");
 			if (bankLinks.ContainsKey(bankGuid))
 			{
@@ -106,7 +103,7 @@ namespace FinanceTracker.Core.Services
 			NewBankLinkStatusForGuid?.Invoke(this, (bankGuid, BankLinkStatus.NotLinked));
 		}
 
-        private async Task<(bool success, string accessCode)> ListenForAuthorisationCode(Guid bankGuid, CancellationToken token)
+        private async Task<(bool success, string accessCode)> ListenForAuthorisationCode(CancellationToken token)
 		{
             var listener = new HttpListener();
             listener.Prefixes.Add(callbackUri);
@@ -156,10 +153,10 @@ namespace FinanceTracker.Core.Services
 
             var content = await response.Content.ReadAsStringAsync();
 
-            var accessToken = GetValueFromContent("access_token", content);
-            var expiresIn = DateTime.Now + TimeSpan.FromSeconds(int.Parse(GetValueFromContent("expires_in", content)));
-            var refreshToken = GetValueFromContent("refresh_token", content);
-            var tokenType = GetValueFromContent("token_type", content);
+            var accessToken = GetValueFromResponse("access_token", content);
+            var expiresIn = DateTime.Now + TimeSpan.FromSeconds(int.Parse(GetValueFromResponse("expires_in", content)));
+            var refreshToken = GetValueFromResponse("refresh_token", content);
+            var tokenType = GetValueFromResponse("token_type", content);
 
             success = tokenType == "Bearer";
 
@@ -187,10 +184,10 @@ namespace FinanceTracker.Core.Services
 
             var content = await response.Content.ReadAsStringAsync();
 
-            bankLinks[bankGuid].AccessToken = GetValueFromContent("access_token", content);
-            bankLinks[bankGuid].AccessExpires = DateTime.Now + TimeSpan.FromSeconds(int.Parse(GetValueFromContent("expires_in", content)));
-            bankLinks[bankGuid].RefreshToken = GetValueFromContent("refresh_token", content);
-            var tokenType = GetValueFromContent("token_type", content);
+            bankLinks[bankGuid].AccessToken = GetValueFromResponse("access_token", content);
+            bankLinks[bankGuid].AccessExpires = DateTime.Now + TimeSpan.FromSeconds(int.Parse(GetValueFromResponse("expires_in", content)));
+            bankLinks[bankGuid].RefreshToken = GetValueFromResponse("refresh_token", content);
+            var tokenType = GetValueFromResponse("token_type", content);
 
             success = tokenType == "Bearer";
 
@@ -208,11 +205,11 @@ namespace FinanceTracker.Core.Services
 
             request.Dispose();
 
-            var linked = response.StatusCode == HttpStatusCode.OK && GetValueFromContent("client_id", content) == clientId;
+            var linked = response.StatusCode == HttpStatusCode.OK && GetValueFromResponse("client_id", content) == clientId;
             return linked ? BankLinkStatus.LinkVerified : BankLinkStatus.LinkBroken;
 		}
 
-        private string GetValueFromContent(string valueName, string content)
+        private string GetValueFromResponse(string valueName, string content)
 		{
             var contentArray = content.Split(',');
             return contentArray.First(x => x.Split(':')[0].Contains(valueName)).Split(':')[1].Replace("\"", "").Trim(new char[] { '{', '}' });

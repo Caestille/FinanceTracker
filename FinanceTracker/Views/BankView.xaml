@@ -156,7 +156,7 @@
 						<ColumnDefinition Width="Auto" />
 						<ColumnDefinition Width="*" />
 					</Grid.ColumnDefinitions>
-					<!--#region -->
+					<!--#region Bank icon, name and renaming-->
 					<Image
 						Grid.Row="0"
 						Grid.Column="0"
@@ -238,6 +238,7 @@
 						</Grid>
 						<!--#endregion-->
 					</controls:ExtendedButton>
+					<!--#endregion-->
 					<!--#region Data import/linking controls-->
 					<Grid
 						Grid.Column="3"
@@ -480,7 +481,6 @@
 						CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
 						MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
 						MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
-						Opacity="1"
 						SnapsToDevicePixels="True"
 						ToolTip="Add new account">
 						<!--#region Button icon-->

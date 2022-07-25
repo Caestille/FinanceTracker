@@ -279,11 +279,9 @@
 						<!--#endregion-->
 						<!--#region Delete button-->
 						<controls:ExtendedButton
-							Visibility="{Binding SupportsDeleting, Converter={StaticResource VisibleIfTrueConverter}}"
 							Width="20"
 							Height="{Binding RelativeSource={RelativeSource Self}, Path=Width}"
 							Margin="10,0"
-							Opacity="0.7"
 							HorizontalAlignment="Right"
 							VerticalAlignment="Center"
 							Background="{DynamicResource ControlClickablePartBrush}"
@@ -292,7 +290,9 @@
 							CornerRadius="12.5"
 							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
 							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
-							ToolTip="Delete">
+							Opacity="0.7"
+							ToolTip="Delete"
+							Visibility="{Binding SupportsDeleting, Converter={StaticResource VisibleIfTrueConverter}}">
 							<controls:ExtendedButton.Style>
 								<Style TargetType="{x:Type controls:ExtendedButton}">
 									<Style.Triggers>
@@ -307,8 +307,8 @@
 									Width="8"
 									Height="9"
 									Margin="0,5,0,0"
-									BorderBrush="{DynamicResource StatusTextBrush}"
 									Background="{DynamicResource StatusTextBrush}"
+									BorderBrush="{DynamicResource StatusTextBrush}"
 									BorderThickness="2"
 									CornerRadius="0,0,1,1" />
 								<Border
