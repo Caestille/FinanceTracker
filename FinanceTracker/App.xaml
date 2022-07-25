@@ -17,6 +17,7 @@
 			<converters:MultiBoolOrToVisibilityConverter x:Key="MultiBoolOrToVisibilityConverter" />
 			<converters:CurrencyFormatterConverter x:Key="CurrencyFormatterConverter" />
 			<converters:VisibilityInverterConverter x:Key="VisibilityInverterConverter" />
+			<converters:BankLinkStatusIsConverterParameterVisibilityConverter x:Key="BankLinkStatusIsConverterParameterVisibilityConverter" />
 		</ResourceDictionary>
 	</Application.Resources>
 </Application>

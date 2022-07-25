@@ -11,6 +11,8 @@ namespace FinanceTracker.Core.Services
 {
 	public class TrueLayerApiService : IBankApiService
 	{
+        public event EventHandler<(Guid, BankLinkStatus)> NewBankLinkStatusForGuid;
+
         private string liveAuthLink = "https://auth.truelayer.com/?response_type=code&client_id=josephward-732872&scope=info%20accounts%20balance%20cards%20transactions%20direct_debits%20standing_orders%20offline_access&redirect_uri=http://localhost:3000/callback&providers=uk-ob-all%20uk-oauth-all";
         private string clientId = "josephward-732872";
         private string clientSecret = "035d9190-3341-4181-99eb-efee840456b4";
@@ -20,35 +22,66 @@ namespace FinanceTracker.Core.Services
         private Dictionary<Guid, LinkedBankModel> bankLinks = new Dictionary<Guid, LinkedBankModel>();
         HttpClient httpClient = new HttpClient();
 
+        private System.Timers.Timer bankLinkValidationTimer = new System.Timers.Timer(1000);
+
         public TrueLayerApiService(IRegistryService registryService)
 		{
             this.registryService = registryService;
+
+            bankLinkValidationTimer.AutoReset = true;
+			bankLinkValidationTimer.Elapsed += BankLinkValidationTimer_Elapsed;
+            bankLinkValidationTimer.Start();
         }
 
 		public async Task<bool> LinkBank(Guid bankGuid, CancellationToken token)
 		{
+            var linkedBank = new LinkedBankModel(registryService, bankGuid);
+            linkedBank.NewBankLinkStatus += LinkedBank_NewBankLinkStatus;
+            linkedBank.BankLinkStatus = BankLinkStatus.Linking;
+            bankLinks[bankGuid] = linkedBank;
+
             Process.Start(new ProcessStartInfo()
             {
                 FileName = liveAuthLink,
                 UseShellExecute = true,
             });
 
-            (bool success, string accessCode) = await ListenForAccessCode(token);
+            (bool success, string authCode) = await ListenForAccessCode(bankGuid, token);
 
             if (!success)
+            {
+                bankLinks[bankGuid].BankLinkStatus = BankLinkStatus.LinkingCancelled;
+                await Task.Delay(2000);
+                DeleteLink(bankGuid);
                 return success;
+            }
 
-            (success, string accessToken, string refreshToken, DateTime expiresIn) = await SwapCodeForAccessTokens(accessCode);
+            (success, string accessToken, string refreshToken, DateTime accessExpires) = await SwapCodeForAccessTokens(authCode);
 
-            bankLinks[bankGuid] = new LinkedBankModel(registryService, bankGuid, accessCode, accessToken, refreshToken, expiresIn, BankLinkStatus.NotConnected);
-            bankLinks[bankGuid].BankLinkStatus = TestBankLinkStatus(bankGuid);
+            if (success)
+            {
+                linkedBank.AccessToken = accessToken;
+                linkedBank.RefreshToken = refreshToken;
+                linkedBank.AccessExpires = accessExpires;
+                linkedBank.AuthorisationCode = authCode;
+            }
+            else
+			{
+                DeleteLink(bankGuid);
+            }
 
             return success;
         }
 
-        public void RefreshLink(Guid bankGuid)
+		private void LinkedBank_NewBankLinkStatus(object? sender, BankLinkStatus e)
+		{
+            NewBankLinkStatusForGuid?.Invoke(this, ((sender as LinkedBankModel).Guid, e));
+        }
+
+		public void RefreshLink(Guid bankGuid)
 		{
             var linkedBank = new LinkedBankModel(registryService, bankGuid);
+            linkedBank.NewBankLinkStatus += LinkedBank_NewBankLinkStatus;
             if (linkedBank.LoadFromRegistry())
 			{
                 bankLinks[bankGuid] = linkedBank;
@@ -58,9 +91,23 @@ namespace FinanceTracker.Core.Services
         public void DeleteLink(Guid bankGuid)
 		{
             registryService.DeleteSubTree(@$"\{bankGuid}");
-		}
+            if (bankLinks.ContainsKey(bankGuid))
+			{
+                bankLinks[bankGuid].NewBankLinkStatus -= LinkedBank_NewBankLinkStatus;
+                bankLinks.Remove(bankGuid);
+            }
+            NewBankLinkStatusForGuid?.Invoke(this, (bankGuid, BankLinkStatus.NotLinked));
+        }
 
-        private async Task<(bool success, string accessCode)> ListenForAccessCode(CancellationToken token)
+        private void BankLinkValidationTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
+        {
+            foreach (var bankLink in bankLinks.Values.Where(x => x.BankLinkStatus != BankLinkStatus.Linking && x.BankLinkStatus != BankLinkStatus.LinkingCancelled))
+			{
+                bankLink.BankLinkStatus = TestBankLinkStatus(bankLink.Guid);
+            }
+        }
+
+        private async Task<(bool success, string accessCode)> ListenForAccessCode(Guid bankGuid, CancellationToken token)
 		{
             var listener = new HttpListener();
             listener.Prefixes.Add(callbackUri);

@@ -8,6 +8,7 @@
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
 	xmlns:local="clr-namespace:FinanceTracker.Views"
 	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+	xmlns:models="clr-namespace:FinanceTracker.Core.Models;assembly=FinanceTracker.Core"
 	xmlns:vms="clr-namespace:FinanceTracker.Core.ViewModels;assembly=FinanceTracker.Core"
 	mc:Ignorable="d">
 	<UserControl.Resources>
@@ -155,6 +156,7 @@
 						<ColumnDefinition Width="Auto" />
 						<ColumnDefinition Width="*" />
 					</Grid.ColumnDefinitions>
+					<!--#region -->
 					<Image
 						Grid.Row="0"
 						Grid.Column="0"
@@ -248,15 +250,7 @@
 							<ColumnDefinition Width="Auto" />
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
-						<Label
-							Margin="0,3,0,0"
-							HorizontalContentAlignment="Center"
-							VerticalContentAlignment="Center"
-							Content="{Binding Status}"
-							FontFamily="{StaticResource OpenSans}"
-							FontWeight="Light"
-							Foreground="{DynamicResource StatusTextBrush}"
-							Visibility="{Binding Status, Converter={StaticResource StringNotEmptyVisibilityConverter}}" />
+						<!--#region Link bank button-->
 						<controls:ExtendedButton
 							Grid.Column="1"
 							Margin="0,6,0,3"
@@ -271,32 +265,65 @@
 							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
 							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
 							ToolTip="Link bank using TrueLayer (opens in browser)">
+							<!--#region Button contents-->
 							<Grid>
 								<Grid.ColumnDefinitions>
 									<ColumnDefinition Width="Auto" />
 									<ColumnDefinition Width="Auto" />
 								</Grid.ColumnDefinitions>
+								<!--#region Button text-->
 								<Label
 									Margin="0"
 									Padding="0"
-									Content="Link bank"
+									Content="{Binding LinkStatus, Converter={StaticResource EnumDescriptionGetterConverter}}"
 									Foreground="{DynamicResource TextBrush}" />
-								<controls:ExtendedButton
+								<!--#endregion-->
+								<!--#region Linked icon-->
+								<Border
 									Grid.Column="6"
 									Width="16"
 									Height="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}"
 									Margin="6,0,0,0"
-									Padding="-3,-3"
 									VerticalAlignment="Center"
-									Background="{DynamicResource ControlClickablePartBrush}"
+									Background="LimeGreen"
 									BorderThickness="0"
-									Command="{Binding CancelTaskCommand}"
 									CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
-									Foreground="{DynamicResource StatusTextBrush}"
-									MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
-									MouseOverColour="{DynamicResource StatusTextBrush}"
-									ToolTip="Cancel"
-									Visibility="{Binding CancellationTokenSource, Converter={StaticResource VisibleIfNotNullConverter}}">
+									ToolTip="Bank linked"
+									Visibility="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterVisibilityConverter}, ConverterParameter={x:Static models:BankLinkStatus.LinkVerified}}">
+									<Grid
+										Width="6"
+										Height="6"
+										HorizontalAlignment="Center"
+										VerticalAlignment="Center">
+										<Line
+											Stroke="{DynamicResource TextBrush}"
+											StrokeThickness="1"
+											X1="4"
+											X2="3"
+											Y1="0"
+											Y2="6" />
+										<Line
+											Stroke="{DynamicResource TextBrush}"
+											StrokeThickness="1"
+											X1="3"
+											X2="6"
+											Y1="6"
+											Y2="0" />
+									</Grid>
+								</Border>
+								<!--#endregion-->
+								<!--#region Link broken icon-->
+								<Border
+									Grid.Column="6"
+									Width="16"
+									Height="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}"
+									Margin="6,0,0,0"
+									VerticalAlignment="Center"
+									Background="Red"
+									BorderThickness="0"
+									CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+									ToolTip="Bank linked"
+									Visibility="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterVisibilityConverter}, ConverterParameter={x:Static models:BankLinkStatus.LinkBroken}}">
 									<Grid
 										Width="6"
 										Height="6"
@@ -317,7 +344,49 @@
 											Y1="6"
 											Y2="0" />
 									</Grid>
+								</Border>
+								<!--#endregion-->
+								<!--#region Cancel linking button-->
+								<controls:ExtendedButton
+									Grid.Column="6"
+									Width="16"
+									Height="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}"
+									Margin="6,0,0,0"
+									Padding="-3,-3"
+									VerticalAlignment="Center"
+									Background="{DynamicResource ControlClickablePartBrush}"
+									BorderThickness="0"
+									Command="{Binding CancelTaskCommand}"
+									CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+									Foreground="{DynamicResource StatusTextBrush}"
+									MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
+									MouseOverColour="{DynamicResource StatusTextBrush}"
+									ToolTip="Cancel"
+									Visibility="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterVisibilityConverter}, ConverterParameter={x:Static models:BankLinkStatus.Linking}}">
+									<!--#region Button icon-->
+									<Grid
+										Width="6"
+										Height="6"
+										HorizontalAlignment="Center"
+										VerticalAlignment="Center">
+										<Line
+											Stroke="{DynamicResource TextBrush}"
+											StrokeThickness="1"
+											X1="0"
+											X2="6"
+											Y1="0"
+											Y2="6" />
+										<Line
+											Stroke="{DynamicResource TextBrush}"
+											StrokeThickness="1"
+											X1="0"
+											X2="6"
+											Y1="6"
+											Y2="0" />
+									</Grid>
+									<!--#endregion-->
 								</controls:ExtendedButton>
+								<!--#endregion-->
 								<controls:CircularProgressBar
 									Grid.Column="1"
 									Width="20"
@@ -329,10 +398,11 @@
 									IsIndeterminate="True"
 									SegmentColor="{DynamicResource ThemeMouseOverBrush}"
 									StrokeThickness="3"
-									Visibility="{Binding Status, Converter={StaticResource StringNotEmptyVisibilityConverter}}" />
+									Visibility="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterVisibilityConverter}, ConverterParameter={x:Static models:BankLinkStatus.Linking}}" />
 							</Grid>
+							<!--#endregion-->
 						</controls:ExtendedButton>
-
+						<!--#region Import data button-->
 						<controls:ExtendedButton
 							Grid.Column="3"
 							Margin="0,6,0,3"
@@ -356,26 +426,17 @@
 									Padding="0"
 									Content="Import data"
 									Foreground="{DynamicResource TextBrush}" />
-								<controls:CircularProgressBar
-									Grid.Column="1"
-									Width="20"
-									Height="20"
-									Margin="5,-5,0,-5"
-									HorizontalAlignment="Center"
-									VerticalAlignment="Center"
-									IsHitTestVisible="False"
-									IsIndeterminate="True"
-									SegmentColor="{DynamicResource ThemeMouseOverBrush}"
-									StrokeThickness="3"
-									Visibility="Collapsed" />
 							</Grid>
 						</controls:ExtendedButton>
+						<!--#endregion-->
+						<!--#region Separator-->
 						<Border
 							Grid.Column="2"
 							Width="1"
 							Margin="10,10,10,6"
 							HorizontalAlignment="Left"
 							Background="{DynamicResource StatusTextBrush}" />
+						<!--#endregion-->
 					</Grid>
 					<!--#endregion-->
 				</Grid>
@@ -459,6 +520,7 @@
 				</ItemsControl>
 			</Grid>
 		</DataTemplate>
+		<!--#endregion-->
 		<!--#endregion-->
 	</UserControl.Resources>
 	<Grid Focusable="False">

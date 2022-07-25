@@ -1,21 +1,30 @@
 ﻿using CoreUtilities.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
 
 namespace FinanceTracker.Core.Models
 {
     public enum BankLinkStatus
     {
-        NotConnected,
+		[Description("Link Bank")]
+        NotLinked,
+
+        [Description("Linking")]
+        Linking,
+
+        [Description("Cancelled")]
+        LinkingCancelled,
+
+        [Description("Linked")]
         LinkVerified,
+
+        [Description("Link Broken")]
         LinkBroken
     }
 
     public class LinkedBankModel
     {
+        public event EventHandler<BankLinkStatus> NewBankLinkStatus;
+
         private IRegistryService registryService;
 
         private Guid guid;
@@ -69,29 +78,24 @@ namespace FinanceTracker.Core.Models
             }
         }
 
-        private BankLinkStatus bankLinkStatus;
+        private BankLinkStatus bankLinkStatus = BankLinkStatus.NotLinked;
         public BankLinkStatus BankLinkStatus
         {
             get => bankLinkStatus;
-            set => bankLinkStatus = value;
+            set
+            {
+                if (bankLinkStatus != value)
+				{
+                    NewBankLinkStatus?.Invoke(this, value);
+				}
+                bankLinkStatus = value;
+            }
         }
 
         public LinkedBankModel(IRegistryService registryService, Guid guid)
         {
             this.registryService = registryService;
             Guid = guid;
-        }
-
-        public LinkedBankModel(IRegistryService registryService, Guid guid, string authCode, string accessToken, string refreshToken, DateTime accessExpires, BankLinkStatus linkStatus)
-        {
-            this.registryService = registryService;
-
-            Guid = guid;
-            AuthorisationCode = authCode;
-            AccessToken = accessToken;
-            RefreshToken = refreshToken;
-            AccessExpires = accessExpires;
-            BankLinkStatus = linkStatus;
         }
 
         public bool LoadFromRegistry()

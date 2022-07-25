@@ -5,6 +5,7 @@ using FinanceTracker.Core.Messages;
 using FinanceTracker.Core.Services;
 using FinanceTracker.Core.Interfaces;
 using CoreUtilities.Interfaces;
+using FinanceTracker.Core.Models;
 
 namespace FinanceTracker.Core.ViewModels
 {
@@ -44,11 +45,11 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref visibleAccount, value);
 		}
 
-		private string status;
-		public string Status
+		private BankLinkStatus linkStatus;
+		public BankLinkStatus LinkStatus
 		{
-			get => status;
-			set => SetProperty(ref status, value);
+			get => linkStatus;
+			set => SetProperty(ref linkStatus, value);
 		}
 
 		private CancellationTokenSource cancellationTokenSource;
@@ -64,11 +65,20 @@ namespace FinanceTracker.Core.ViewModels
 
 			this.registryService = registryService;
 			truelayerService = bankApiService;
+			truelayerService.NewBankLinkStatusForGuid += TruelayerService_NewBankLinkStatusForGuid;
 			bankGuid = guid ?? Guid.NewGuid();
 			registryService.SetSetting(bankGuid.ToString(), Name, @"\Banks");
 			if (guid != null)
 			{
 				truelayerService.RefreshLink(guid.Value);
+			}
+		}
+
+		private void TruelayerService_NewBankLinkStatusForGuid(object? sender, (Guid, BankLinkStatus) e)
+		{
+			if (e.Item1 == bankGuid)
+			{
+				LinkStatus = e.Item2;
 			}
 		}
 
@@ -119,21 +129,8 @@ namespace FinanceTracker.Core.ViewModels
 				return;
 
 			CancellationTokenSource = new CancellationTokenSource();
-			Status = "Opening TrueLayer";
 			var result = await truelayerService.LinkBank(bankGuid, cancellationTokenSource.Token);
-			if (!result)
-			{
-				Status = "Cancelled";
-				CancellationTokenSource = null;
-				await Task.Delay(2000);
-			}
-			else
-			{
-				Status = "Success";
-				CancellationTokenSource = null;
-				await Task.Delay(2000);
-			}
-			Status = null;
+			await Task.Delay(2000);
 			CancellationTokenSource = null;
 		}
 
