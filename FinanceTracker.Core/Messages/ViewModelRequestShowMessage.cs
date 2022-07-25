@@ -4,9 +4,9 @@ namespace FinanceTracker.Core.Messages
 {
 	public class ViewModelRequestShowMessage
 	{
-		public ViewModelBase ViewModel { get; protected set; }
+		public ViewModelBase? ViewModel { get; protected set; }
 
-		public ViewModelRequestShowMessage(ViewModelBase viewModelToShow)
+		public ViewModelRequestShowMessage(ViewModelBase? viewModelToShow)
 		{
 			ViewModel = viewModelToShow;
 		}

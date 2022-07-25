@@ -29,8 +29,8 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref isEditingName, value);
 		}
 
-		private string temporaryName;
-		public string TemporaryName
+		private string? temporaryName;
+		public string? TemporaryName
 		{
 			get => temporaryName;
 			set => SetProperty(ref temporaryName, value);
@@ -38,8 +38,8 @@ namespace FinanceTracker.Core.ViewModels
 
 		public override bool SupportsAddingChildren => false;
 
-		private ViewModelBase visibleAccount;
-		public ViewModelBase VisibleAccount
+		private ViewModelBase? visibleAccount;
+		public ViewModelBase? VisibleAccount
 		{
 			get => visibleAccount;
 			set => SetProperty(ref visibleAccount, value);
@@ -52,8 +52,8 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref linkStatus, value);
 		}
 
-		private CancellationTokenSource cancellationTokenSource;
-		public CancellationTokenSource CancellationTokenSource
+		private CancellationTokenSource? cancellationTokenSource;
+		public CancellationTokenSource? CancellationTokenSource
 		{
 			get => cancellationTokenSource;
 			set => SetProperty(ref cancellationTokenSource, value);
@@ -91,16 +91,17 @@ namespace FinanceTracker.Core.ViewModels
 			}
 			else
             {
-				Name = TemporaryName;
+				if (TemporaryName != null)
+					Name = TemporaryName;
 				IsEditingName = false;
             }
 		}
 
-		private void NameEditorKeyDown(object args)
+		private void NameEditorKeyDown(object? args)
 		{
-			if (args is KeyEventArgs e && (e.Key == Key.Enter || e.Key == Key.Escape))
+			if (args != null && args is KeyEventArgs e && (e.Key == Key.Enter || e.Key == Key.Escape))
 			{
-				if (e.Key == Key.Enter)
+				if (e.Key == Key.Enter && TemporaryName != null)
 				{
 					Name = TemporaryName;
 					registryService.SetSetting(bankGuid.ToString(), Name, @"\Banks");
@@ -129,14 +130,14 @@ namespace FinanceTracker.Core.ViewModels
 				return;
 
 			CancellationTokenSource = new CancellationTokenSource();
-			var result = await truelayerService.LinkBank(bankGuid, cancellationTokenSource.Token);
+			var result = await truelayerService.LinkBank(bankGuid, CancellationTokenSource.Token);
 			await Task.Delay(2000);
 			CancellationTokenSource = null;
 		}
 
 		private void CancelTask()
 		{
-			CancellationTokenSource.Cancel();
+			CancellationTokenSource?.Cancel();
 		}
 	}
 }

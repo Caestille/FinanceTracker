@@ -23,7 +23,7 @@ namespace FinanceTracker.Core.Models
 
     public class LinkedBankModel
     {
-        public event EventHandler<BankLinkStatus> NewBankLinkStatus;
+        public event EventHandler<BankLinkStatus>? NewBankLinkStatus;
 
         private IRegistryService registryService;
 
@@ -34,8 +34,8 @@ namespace FinanceTracker.Core.Models
             set => guid = value;
         }
 
-        private string authorisationCode;
-        public string AuthorisationCode
+        private string? authorisationCode;
+        public string? AuthorisationCode
         {
             get => authorisationCode;
             set
@@ -45,8 +45,8 @@ namespace FinanceTracker.Core.Models
             }
         }
 
-        private string accessToken;
-        public string AccessToken
+        private string? accessToken;
+        public string? AccessToken
         {
             get => accessToken;
             set
@@ -56,8 +56,8 @@ namespace FinanceTracker.Core.Models
             }
         }
 
-        private string refreshToken;
-        public string RefreshToken
+        private string? refreshToken;
+        public string? RefreshToken
         {
             get => refreshToken;
             set
@@ -67,8 +67,8 @@ namespace FinanceTracker.Core.Models
             }
         }
 
-        private DateTime accessExpires;
-        public DateTime AccessExpires
+        private DateTime? accessExpires;
+        public DateTime? AccessExpires
         {
             get => accessExpires;
             set

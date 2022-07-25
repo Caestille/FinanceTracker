@@ -26,7 +26,7 @@ namespace FinanceTracker.Converters
 			var bankName = (string)value;
 			var matchedBank = availableBankNames.FirstOrDefault(x => bankName?.IndexOf(x, StringComparison.OrdinalIgnoreCase) != -1);
 			if (matchedBank == null)
-				return null;
+				return Binding.DoNothing;
 			var uri = new Uri(@$"../Images/{matchedBank?.Replace(" ", "")}.png", UriKind.Relative);
 			var bitmap = new BitmapImage(uri);
 			return bitmap;

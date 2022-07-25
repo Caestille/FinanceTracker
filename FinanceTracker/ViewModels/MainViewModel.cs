@@ -23,8 +23,8 @@ namespace FinanceTracker.ViewModels
 		public ICommand ToggleMenuPinCommand => new RelayCommand(ToggleMenuPin);
 		public ICommand FormLoadedCommand => new RelayCommand(Loaded);
 
-		private ViewModelBase visibleViewModel;
-		public ViewModelBase VisibleViewModel
+		private ViewModelBase? visibleViewModel;
+		public ViewModelBase? VisibleViewModel
 		{
 			get => visibleViewModel;
 			set => SetProperty(ref visibleViewModel, value);
@@ -73,7 +73,7 @@ namespace FinanceTracker.ViewModels
 		{
 			get
 			{
-				return new RangeObservableCollection<ViewModelBase>(AllViewModels.Where(x => x.Name.Contains(SearchText, System.StringComparison.OrdinalIgnoreCase)));
+				return new RangeObservableCollection<ViewModelBase>(AllViewModels.Where(x => x.Name != null && x.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase)));
 			}
 		}
 
@@ -91,7 +91,7 @@ namespace FinanceTracker.ViewModels
 			Messenger.Register<ViewModelRequestShowMessage>(this, (sender, message) => 
 			{
 				VisibleViewModel = message.ViewModel;
-				VisibleViewModel.IsSelected = true;
+				if (VisibleViewModel != null) VisibleViewModel.IsSelected = true;
 				SearchText = string.Empty; 
 			});
 
