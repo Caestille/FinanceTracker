@@ -25,15 +25,15 @@ namespace FinanceTracker.Core.Models
 			set => SetProperty(ref outValue, value);
 		}
 
-		private string? description;
-		public string? Description
+		private string description;
+		public string Description
 		{
 			get => description;
 			set => SetProperty(ref description, value);
 		}
 
-		private string? tag;
-		public string? Tag
+		private string tag;
+		public string Tag
 		{
 			get => tag;
 			set => SetProperty(ref tag, value);

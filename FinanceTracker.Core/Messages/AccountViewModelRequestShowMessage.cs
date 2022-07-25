@@ -4,7 +4,7 @@ namespace FinanceTracker.Core.Messages
 {
 	public class AccountViewModelRequestShowMessage : ViewModelRequestShowMessage
 	{
-		public AccountViewModelRequestShowMessage(ViewModelBase? viewModelToShow) : base(viewModelToShow)
+		public AccountViewModelRequestShowMessage(ViewModelBase viewModelToShow) : base(viewModelToShow)
 		{
 			ViewModel = viewModelToShow;
 		}

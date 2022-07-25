@@ -10,17 +10,17 @@ namespace FinanceTracker.Core.ViewModels
 {
 	public class ViewModelBase : ObservableRecipient
 	{
-		private Func<ViewModelBase>? createChildFunc;
+		private Func<ViewModelBase> createChildFunc;
 
 		public ICommand SelectCommand => new RelayCommand(Select);
 		public ICommand AddChildCommand => new RelayCommand(AddChild);
 		public ICommand RequestDeleteCommand => new RelayCommand(RequestDelete);
 
-		private string? name;
-		public string? Name
+		private string name;
+		public string Name
 		{
 			get => name;
-			set => SetProperty(ref name, value?.TrimStart());
+			set => SetProperty(ref name, value.TrimStart());
 		}
 
 		private RangeObservableCollection<ViewModelBase> childViewModels = new();
@@ -67,13 +67,19 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref level, value);
 		}
 
+		private BitmapImage icon;
+		public BitmapImage Icon
+		{
+			get => icon;
+			set => SetProperty(ref icon, value);
+		}
+
 		protected IMessenger BaseMessenger => Messenger;
 
-		public ViewModelBase(string name, Func<ViewModelBase>? createChild = null)
+		public ViewModelBase(string name, Func<ViewModelBase> createChild = null)
 		{
 			Name = name;
-			if (createChild != null)
-				createChildFunc = createChild;
+			createChildFunc = createChild;
 
 			BindMessages();
 
@@ -106,7 +112,7 @@ namespace FinanceTracker.Core.ViewModels
 			});
 		}
 
-		protected virtual void OnViewModelRequestShow(ViewModelBase? viewModel)
+		protected virtual void OnViewModelRequestShow(ViewModelBase viewModel)
 		{
 			if (viewModel != this)
 			{
@@ -128,9 +134,6 @@ namespace FinanceTracker.Core.ViewModels
 
 		protected virtual void AddChild() 
 		{
-			if (createChildFunc == null)
-				return;
-				
 			ChildViewModels.Add(createChildFunc());
 
 			foreach (var vm in ChildViewModels)

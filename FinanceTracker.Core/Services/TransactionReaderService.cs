@@ -4,7 +4,7 @@ namespace FinanceTracker.Core.Services
 {
 	public class TransactionReaderService : ITransactionReaderService
 	{
-		public event EventHandler<int>? ReadingProgressUpdated;
+		public event EventHandler<int> ReadingProgressUpdated;
 
 		public async Task<List<DecodedTransactionRow>> Read(string path, FormatProvider formatProvider)
 		{

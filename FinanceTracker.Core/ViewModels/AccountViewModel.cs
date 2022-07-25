@@ -30,8 +30,8 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref isEditingName, value);
 		}
 
-		private string? temporaryName;
-		public string? TemporaryName
+		private string temporaryName;
+		public string TemporaryName
 		{
 			get => temporaryName;
 			set => SetProperty(ref temporaryName, value);
@@ -55,17 +55,16 @@ namespace FinanceTracker.Core.ViewModels
 			}
 			else
 			{
-				if (TemporaryName != null)
-					Name = TemporaryName;
+				Name = TemporaryName;
 				IsEditingName = false;
 			}
 		}
 
-		private void NameEditorKeyDown(object? args)
+		private void NameEditorKeyDown(object args)
 		{
-			if (args != null && args is KeyEventArgs e && (e.Key == Key.Enter || e.Key == Key.Escape))
+			if (args is KeyEventArgs e && (e.Key == Key.Enter || e.Key == Key.Escape))
 			{
-				if (e.Key == Key.Enter && TemporaryName != null)
+				if (e.Key == Key.Enter)
 				{
 					Name = TemporaryName;
 				}

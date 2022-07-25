@@ -11,7 +11,7 @@ namespace FinanceTracker.Core.Services
 {
 	public class TrueLayerApiService : IBankApiService
 	{
-        public event EventHandler<(Guid, BankLinkStatus)>? NewBankLinkStatusForGuid;
+        public event EventHandler<(Guid, BankLinkStatus)> NewBankLinkStatusForGuid;
 
         private string liveAuthLink = "https://auth.truelayer.com/?response_type=code&client_id=josephward-732872&scope=info%20accounts%20balance%20cards%20transactions%20direct_debits%20standing_orders%20offline_access&redirect_uri=http://localhost:3000/callback&providers=uk-ob-all%20uk-oauth-all";
         private string clientId = "josephward-732872";
@@ -75,8 +75,7 @@ namespace FinanceTracker.Core.Services
 
 		private void LinkedBank_NewBankLinkStatus(object? sender, BankLinkStatus e)
 		{
-            if (sender is LinkedBankModel bankModel)
-                NewBankLinkStatusForGuid?.Invoke(this, (bankModel.Guid, e));
+            NewBankLinkStatusForGuid?.Invoke(this, ((sender as LinkedBankModel).Guid, e));
         }
 
 		public void RefreshLink(Guid bankGuid)

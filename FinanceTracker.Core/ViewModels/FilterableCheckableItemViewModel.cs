@@ -14,11 +14,11 @@ namespace FinanceTracker.Core.ViewModels
 			IsChecked = !IsChecked;
 		}
 
-		//private bool suppressNextNotification;
-		//public void SuppressNextNotification()
-		//{
-			//suppressNextNotification = true;
-		//}
+		private bool suppressNextNotification;
+		public void SuppressNextNotification()
+		{
+			suppressNextNotification = true;
+		}
 
 		public string? Name { get; set; }
 		public string? DisplayName { get; set; }
@@ -34,7 +34,7 @@ namespace FinanceTracker.Core.ViewModels
 				//if (updated && !suppressNextNotification)
 					//CheckedChanged?.Invoke(this, isChecked);
 				
-				//suppressNextNotification = false;
+				suppressNextNotification = false;
 			}
 		}
 

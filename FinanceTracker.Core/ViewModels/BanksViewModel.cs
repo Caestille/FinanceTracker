@@ -12,8 +12,6 @@ namespace FinanceTracker.Core.ViewModels
 {
 	public class BanksViewModel : ViewModelBase
 	{
-		private const string UnnamedBankName = "Unnamed Bank";
-
 		public override RangeObservableCollection<BankViewModel> BankData 
 		{ 
 			get => new RangeObservableCollection<BankViewModel>(ChildViewModels.Select(x => (BankViewModel)x)); 
@@ -26,12 +24,12 @@ namespace FinanceTracker.Core.ViewModels
 
 		public BanksViewModel(IBankApiService bankApiService, IRegistryService registryService)
 			: base("Banks", new Func<ViewModelBase>(
-				() => new BankViewModel(bankApiService, registryService, UnnamedBankName))) 
+				() => new BankViewModel(bankApiService, registryService, "Unnamed Bank"))) 
 		{
 			var existingBanks = registryService.GetAllSettingsInPath(@"\Banks");
 			foreach (var kvp in existingBanks)
 			{
-				ChildViewModels.Add(new BankViewModel(bankApiService, registryService, kvp.Value.ToString() ?? UnnamedBankName, Guid.Parse(kvp.Key)));
+				ChildViewModels.Add(new BankViewModel(bankApiService, registryService, kvp.Value.ToString(), Guid.Parse(kvp.Key)));
 			}
 			NotifyBanksChanged();
 		}
