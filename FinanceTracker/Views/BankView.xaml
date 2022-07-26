@@ -262,12 +262,12 @@
 							BorderThickness="0"
 							Command="{Binding LinkBankCommand}"
 							CornerRadius="5"
-							Foreground="{DynamicResource StatusTextBrush}"
+							Foreground="{DynamicResource TextBrush}"
 							IsEnabled="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterConverter}, ConverterParameter={x:Static models:BankLinkStatus.NotLinked}}"
 							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
 							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
-							DisabledBackgroundColour="Black"
-							DisabledForegroundColour="Gray"
+							DisabledBackgroundColour="{DynamicResource StatusTextLightBrush}"
+							DisabledForegroundColour="{DynamicResource StatusTextBrush}"
 							ToolTip="Link bank using TrueLayer (opens in browser)">
 							<!--#region Button contents-->
 							<Grid>
@@ -279,8 +279,17 @@
 								<Label
 									Margin="0"
 									Padding="0"
-									Content="{Binding LinkStatus, Converter={StaticResource EnumDescriptionGetterConverter}}"
-									Foreground="{DynamicResource TextBrush}" />
+									Content="{Binding LinkStatus, Converter={StaticResource EnumDescriptionGetterConverter}}">
+									<Label.Style>
+										<Style TargetType="{x:Type Label}">
+											<Style.Triggers>
+												<Trigger Property="IsEnabled" Value="False">
+													<Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=DisabledForegroundColour}" />
+												</Trigger>
+											</Style.Triggers>
+										</Style>
+									</Label.Style>
+								</Label>
 								<!--#endregion-->
 								<!--#region Linked icon-->
 								<Border
@@ -411,6 +420,7 @@
 									<!--#endregion-->
 								</controls:ExtendedButton>
 								<!--#endregion-->
+								<!--#region Progress bar-->
 								<controls:CircularProgressBar
 									Grid.Column="1"
 									Width="20"
@@ -431,10 +441,11 @@
 										</MultiBinding>
 									</controls:CircularProgressBar.Visibility>
 								</controls:CircularProgressBar>
+								<!--#endregion-->
 							</Grid>
+							<!--#endregion-->
 						</controls:ExtendedButton>
 						<!--#endregion-->
-
 						<!--#region Import data button-->
 						<controls:ExtendedButton
 							Grid.Column="3"
