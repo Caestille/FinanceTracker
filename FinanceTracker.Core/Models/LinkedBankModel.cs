@@ -98,6 +98,11 @@ namespace FinanceTracker.Core.Models
             Guid = guid;
         }
 
+        public bool IsAboutToExpire()
+		{
+            return AccessExpires - DateTime.Now < TimeSpan.FromMinutes(1);
+		}
+
         public bool LoadFromRegistry()
         {
             registryService.TryGetSetting(nameof(AuthorisationCode), string.Empty, out var authCode, $@"\{guid}");

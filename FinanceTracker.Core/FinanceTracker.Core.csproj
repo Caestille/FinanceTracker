@@ -26,4 +26,8 @@
 	  <Resource Include="Services\LiveAuthLink.txt" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <Folder Include="Helper Classes\" />
+	</ItemGroup>
+
 </Project>

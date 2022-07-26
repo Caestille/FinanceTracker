@@ -58,7 +58,8 @@ namespace FinanceTracker
 
 			IRegistryService appRegistryService = new RegistryService(@"SOFTWARE\FinanceTracker");
 			IRegistryService trueLayerRegistryService = new RegistryService(@"SOFTWARE\TrueLayerApi");
-			IBankApiService bankApiService = new TrueLayerApiService(trueLayerRegistryService); 
+			IHttpService httpService = new HttpService(() => new HttpRequestBuilder());
+			IBankApiService bankApiService = new TrueLayerApiService(trueLayerRegistryService, httpService); 
 
 			var viewModels = new List<ViewModelBase>()
 			{

@@ -1,11 +1,8 @@
-﻿using CoreUtilities.HelperClasses;
-using CoreUtilities.Interfaces;
+﻿using CoreUtilities.Interfaces;
 using FinanceTracker.Core.Interfaces;
 using FinanceTracker.Core.Models;
 using System.Diagnostics;
 using System.Net;
-using System.Net.Http.Headers;
-using System.Text;
 
 namespace FinanceTracker.Core.Services
 {
@@ -18,15 +15,18 @@ namespace FinanceTracker.Core.Services
         private string clientSecret = "035d9190-3341-4181-99eb-efee840456b4";
         private string callbackUri = @"http://localhost:3000/";
 
+        private bool isRequestExecuting;
+
         private IRegistryService registryService;
+        private IHttpService httpService;
         private Dictionary<Guid, LinkedBankModel> bankLinks = new Dictionary<Guid, LinkedBankModel>();
-        HttpClient httpClient = new HttpClient();
 
         private System.Timers.Timer bankLinkValidationTimer = new System.Timers.Timer(1000);
 
-        public TrueLayerApiService(IRegistryService registryService)
+        public TrueLayerApiService(IRegistryService registryService, IHttpService httpService)
 		{
             this.registryService = registryService;
+            this.httpService = httpService;
 
             bankLinkValidationTimer.AutoReset = true;
 			bankLinkValidationTimer.Elapsed += BankLinkValidationTimer_Elapsed;
@@ -34,7 +34,8 @@ namespace FinanceTracker.Core.Services
         }
 
 		public async Task<bool> LinkBank(Guid bankGuid, CancellationToken token)
-		{
+        {
+            isRequestExecuting = true;
             var linkedBank = new LinkedBankModel(registryService, bankGuid);
             linkedBank.NewBankLinkStatus += LinkedBank_NewBankLinkStatus;
             linkedBank.BankLinkStatus = BankLinkStatus.Linking;
@@ -46,7 +47,7 @@ namespace FinanceTracker.Core.Services
                 UseShellExecute = true,
             });
 
-            (bool success, string authCode) = await ListenForAuthorisationCode(token);
+            (bool success, string authCode) = await httpService.WaitForAndQueryResponseOverUri(callbackUri, "code", token);
 
             if (!success)
             {
@@ -71,28 +72,37 @@ namespace FinanceTracker.Core.Services
                 await DeleteLink(bankGuid);
             }
 
+            isRequestExecuting = false;
             return success;
         }
 
 		public void ReloadBankLinkDetails(Guid bankGuid)
-		{
+        {
+            isRequestExecuting = true;
+
             var linkedBank = new LinkedBankModel(registryService, bankGuid);
             linkedBank.NewBankLinkStatus += LinkedBank_NewBankLinkStatus;
             if (linkedBank.LoadFromRegistry())
 			{
                 bankLinks[bankGuid] = linkedBank;
             }
-		}
+
+            isRequestExecuting = false;
+        }
 
         public async Task DeleteLink(Guid bankGuid)
-		{
-            var request = new HttpRequestMessage(new HttpMethod("DELETE"), "https://auth.truelayer.com/api/delete");
-            request.Headers.TryAddWithoutValidation("Accept", "application/json");
-            request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {bankLinks[bankGuid].AccessToken}");
+        {
+            isRequestExecuting = true;
 
-            var response = await httpClient.SendAsync(request);
+            var request = httpService.GetHttpRequestBuilder()
+                .CreateRequest(IHttpRequestBuilder.HttpCommandType.Delete, "https://auth.truelayer.com/api/delete")
+                .WithUnvalidatedHeader("Accept", "application/json")
+                .WithUnvalidatedHeader("Authorization", $"Bearer {bankLinks[bankGuid].AccessToken}")
+                .Build();
 
-            var success = response.StatusCode == HttpStatusCode.OK;
+            (HttpStatusCode status, string response) = await httpService.SendAsyncDisposeAndGetResponse(request);
+
+            // TODO: what if deleting fails?
 
 			registryService.DeleteSubTree(@$"\{bankGuid}");
 			if (bankLinks.ContainsKey(bankGuid))
@@ -101,127 +111,104 @@ namespace FinanceTracker.Core.Services
 				bankLinks.Remove(bankGuid);
 			}
 			NewBankLinkStatusForGuid?.Invoke(this, (bankGuid, BankLinkStatus.NotLinked));
-		}
 
-        private async Task<(bool success, string accessCode)> ListenForAuthorisationCode(CancellationToken token)
-		{
-            var listener = new HttpListener();
-            listener.Prefixes.Add(callbackUri);
-            listener.Start();
-
-            HttpListenerContext? context = null;
-            try
-            {
-                context = await listener.GetContextAsync().AsCancellable(token);
-            }
-            catch (TaskCanceledException)
-            {
-                listener.Stop();
-                return (false, string.Empty);
-            }
-
-            string html = string.Format("<html><body></body></html>");
-            var buffer = Encoding.UTF8.GetBytes(html);
-            context.Response.ContentLength64 = buffer.Length;
-            var stream = context.Response.OutputStream;
-            var responseTask = stream.WriteAsync(buffer, 0, buffer.Length).ContinueWith((task) =>
-            {
-                stream.Close();
-                listener.Stop();
-            });
-
-            string? authCode = context.Request.QueryString["code"];
-
-            return (authCode != null, authCode ?? string.Empty);
+            isRequestExecuting = false;
         }
 
         private async Task<(bool success, string accessToken, string refreshToken, DateTime expiresIn)> SwapCodeForAccessTokens(string authCode)
-		{
-            var request = new HttpRequestMessage(new HttpMethod("POST"), "https://auth.truelayer.com/connect/token");
-            request.Headers.TryAddWithoutValidation("Accept", "application/json");
-            request.Content = new StringContent("{ \"grant_type\": \"authorization_code\", \"client_id\": \"" + clientId + "\", \"client_secret\": \"" + clientSecret + "\", \"code\": \"" + authCode + "\", \"redirect_uri\": \"" + callbackUri + "callback\" }");
-            request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+        {
+            isRequestExecuting = true;
 
-            var response = await httpClient.SendAsync(request);
+            var request = httpService.GetHttpRequestBuilder()
+                .CreateRequest(IHttpRequestBuilder.HttpCommandType.Post, "https://auth.truelayer.com/connect/token")
+                .WithUnvalidatedHeader("Accept", "application/json")
+                .WithContent("grant_type", "authorization_code")
+                .WithContent("client_id", clientId)
+                .WithContent("client_secret", clientSecret)
+                .WithContent("code", authCode)
+                .WithContent("redirect_uri", callbackUri + "callback")
+                .Build();
 
-            request.Dispose();
+            (HttpStatusCode status, string response) = await httpService.SendAsyncDisposeAndGetResponse(request);
 
-            var success = response.StatusCode == HttpStatusCode.OK;
+            var success = status == HttpStatusCode.OK;
 
             if (!success)
                 return (success, string.Empty, string.Empty, DateTime.Now);
 
-            var content = await response.Content.ReadAsStringAsync();
-
-            var accessToken = GetValueFromResponse("access_token", content);
-            var expiresIn = DateTime.Now + TimeSpan.FromSeconds(int.Parse(GetValueFromResponse("expires_in", content)));
-            var refreshToken = GetValueFromResponse("refresh_token", content);
-            var tokenType = GetValueFromResponse("token_type", content);
+            var accessToken = httpService.QueryValueFromResponse("access_token", response);
+            var expiresIn = DateTime.Now + TimeSpan.FromSeconds(int.Parse(httpService.QueryValueFromResponse("expires_in", response)));
+            var refreshToken = httpService.QueryValueFromResponse("refresh_token", response);
+            var tokenType = httpService.QueryValueFromResponse("token_type", response);
 
             success = tokenType == "Bearer";
 
+            isRequestExecuting = false;
             return (success, accessToken, refreshToken, expiresIn);
         }
 
         private async Task<bool> RefreshBankLinkIfNeeded(Guid bankGuid)
         {
-            if (bankLinks[bankGuid].AccessExpires - DateTime.Now > TimeSpan.FromMinutes(1))
+            if (!bankLinks[bankGuid].IsAboutToExpire())
                 return false;
 
-            var request = new HttpRequestMessage(new HttpMethod("POST"), "https://auth.truelayer.com/connect/token");
-            request.Headers.TryAddWithoutValidation("Accept", "application/json");
-            request.Content = new StringContent("{ \"grant_type\": \"refresh_token\", \"client_id\": \"" + clientId + "\", \"client_secret\": \"" + clientSecret + "\", \"refresh_token\": \"" + bankLinks[bankGuid].RefreshToken + "\" }");
-            request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
+            isRequestExecuting = true;
 
-            var response = await httpClient.SendAsync(request);
+            var request = httpService.GetHttpRequestBuilder()
+                .CreateRequest(IHttpRequestBuilder.HttpCommandType.Post, "https://auth.truelayer.com/connect/token")
+                .WithUnvalidatedHeader("Accept", "application/json")
+                .WithContent("grant_type", "refresh_token")
+                .WithContent("client_id", clientId)
+                .WithContent("client_secret", clientSecret)
+                .WithContent("refresh_token", bankLinks[bankGuid].RefreshToken)
+                .Build();
 
-            request.Dispose();
+            (HttpStatusCode status, string response) = await httpService.SendAsyncDisposeAndGetResponse(request);
 
-            var success = response.StatusCode == HttpStatusCode.OK;
+            var success = status == HttpStatusCode.OK;
 
             if (!success)
                 return false;
 
-            var content = await response.Content.ReadAsStringAsync();
-
-            bankLinks[bankGuid].AccessToken = GetValueFromResponse("access_token", content);
-            bankLinks[bankGuid].AccessExpires = DateTime.Now + TimeSpan.FromSeconds(int.Parse(GetValueFromResponse("expires_in", content)));
-            bankLinks[bankGuid].RefreshToken = GetValueFromResponse("refresh_token", content);
-            var tokenType = GetValueFromResponse("token_type", content);
+            bankLinks[bankGuid].AccessToken = httpService.QueryValueFromResponse("access_token", response);
+            bankLinks[bankGuid].AccessExpires = DateTime.Now + TimeSpan.FromSeconds(int.Parse(httpService.QueryValueFromResponse("expires_in", response)));
+            bankLinks[bankGuid].RefreshToken = httpService.QueryValueFromResponse("refresh_token", response);
+            var tokenType = httpService.QueryValueFromResponse("token_type", response);
 
             success = tokenType == "Bearer";
 
+            isRequestExecuting = false;
             return success;
         }
 
-        private async Task<BankLinkStatus> TestBankLinkStatus(Guid bankGuid)
-		{
-            var request = new HttpRequestMessage(new HttpMethod("GET"), "https://api.truelayer.com/data/v1/me");
-            request.Headers.TryAddWithoutValidation("Accept", "application/json");
-            request.Headers.TryAddWithoutValidation("Authorization", $"Bearer {bankLinks[bankGuid].AccessToken}");
+        private async Task<BankLinkStatus> GetBankLinkStatus(Guid bankGuid)
+        {
+            isRequestExecuting = true;
 
-            var response = await httpClient.SendAsync(request);
-            var content = await response.Content.ReadAsStringAsync();
+            var request = httpService.GetHttpRequestBuilder()
+                .CreateRequest(IHttpRequestBuilder.HttpCommandType.Get, "https://api.truelayer.com/data/v1/me")
+                .WithUnvalidatedHeader("Accept", "application/json")
+                .WithUnvalidatedHeader("Authorization", $"Bearer {bankLinks[bankGuid].AccessToken}")
+                .Build();
 
-            request.Dispose();
+            (HttpStatusCode status, string response) = await httpService.SendAsyncDisposeAndGetResponse(request);
 
-            var linked = response.StatusCode == HttpStatusCode.OK && GetValueFromResponse("client_id", content) == clientId;
+            var linked = status == HttpStatusCode.OK && httpService.QueryValueFromResponse("client_id", response) == clientId;
+
+            isRequestExecuting = false;
             return linked ? BankLinkStatus.LinkVerified : BankLinkStatus.LinkBroken;
 		}
 
-        private string GetValueFromResponse(string valueName, string content)
-		{
-            var contentArray = content.Split(',');
-            return contentArray.First(x => x.Split(':')[0].Contains(valueName)).Split(':')[1].Replace("\"", "").Trim(new char[] { '{', '}' });
-        }
-
         private async void BankLinkValidationTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
         {
+            if (isRequestExecuting)
+                return;
+
             foreach (var bankLink in bankLinks.Values.Where(x => x.BankLinkStatus != BankLinkStatus.Linking && x.BankLinkStatus != BankLinkStatus.LinkingCancelled))
             {
                 try
                 {
-                    bankLink.BankLinkStatus = await TestBankLinkStatus(bankLink.Guid);
+                    bankLink.BankLinkStatus = await GetBankLinkStatus(bankLink.Guid);
                     await RefreshBankLinkIfNeeded(bankLink.Guid);
                 }
                 catch { /* Probably deleted */ }
