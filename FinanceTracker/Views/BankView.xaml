@@ -263,8 +263,11 @@
 							Command="{Binding LinkBankCommand}"
 							CornerRadius="5"
 							Foreground="{DynamicResource StatusTextBrush}"
+							IsEnabled="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterConverter}, ConverterParameter={x:Static models:BankLinkStatus.NotLinked}}"
 							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
 							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
+							DisabledBackgroundColour="Black"
+							DisabledForegroundColour="Gray"
 							ToolTip="Link bank using TrueLayer (opens in browser)">
 							<!--#region Button contents-->
 							<Grid>
@@ -289,8 +292,15 @@
 									Background="LimeGreen"
 									BorderThickness="0"
 									CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
-									ToolTip="TrueLayer API poll successful"
-									Visibility="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterVisibilityConverter}, ConverterParameter={x:Static models:BankLinkStatus.LinkVerified}}">
+									ToolTip="TrueLayer API poll successful">
+									<Border.Visibility>
+										<MultiBinding Converter="{StaticResource MultiBoolAndToVisibilityConverter}">
+											<Binding
+												Converter="{StaticResource BankLinkStatusIsConverterParameterConverter}"
+												ConverterParameter="{x:Static models:BankLinkStatus.LinkVerified}"
+												Path="LinkStatus" />
+										</MultiBinding>
+									</Border.Visibility>
 									<Grid
 										Width="6"
 										Height="6"
@@ -323,8 +333,15 @@
 									Background="Red"
 									BorderThickness="0"
 									CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
-									ToolTip="TrueLayer API poll failed"
-									Visibility="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterVisibilityConverter}, ConverterParameter={x:Static models:BankLinkStatus.LinkBroken}}">
+									ToolTip="TrueLayer API poll failed">
+									<Border.Visibility>
+										<MultiBinding Converter="{StaticResource MultiBoolAndToVisibilityConverter}">
+											<Binding
+												Converter="{StaticResource BankLinkStatusIsConverterParameterConverter}"
+												ConverterParameter="{x:Static models:BankLinkStatus.LinkBroken}"
+												Path="LinkStatus" />
+										</MultiBinding>
+									</Border.Visibility>
 									<Grid
 										Width="6"
 										Height="6"
@@ -361,8 +378,15 @@
 									CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
 									MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
 									MouseOverColour="{DynamicResource StatusTextBrush}"
-									ToolTip="Cancel"
-									Visibility="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterVisibilityConverter}, ConverterParameter={x:Static models:BankLinkStatus.Linking}}">
+									ToolTip="Cancel">
+									<controls:ExtendedButton.Visibility>
+										<MultiBinding Converter="{StaticResource MultiBoolAndToVisibilityConverter}">
+											<Binding
+												Converter="{StaticResource BankLinkStatusIsConverterParameterConverter}"
+												ConverterParameter="{x:Static models:BankLinkStatus.Linking}"
+												Path="LinkStatus" />
+										</MultiBinding>
+									</controls:ExtendedButton.Visibility>
 									<!--#region Button icon-->
 									<Grid
 										Width="6"
@@ -397,11 +421,20 @@
 									IsHitTestVisible="False"
 									IsIndeterminate="True"
 									SegmentColor="{DynamicResource ThemeMouseOverBrush}"
-									StrokeThickness="3"
-									Visibility="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterVisibilityConverter}, ConverterParameter={x:Static models:BankLinkStatus.Linking}}" />
+									StrokeThickness="3">
+									<controls:CircularProgressBar.Visibility>
+										<MultiBinding Converter="{StaticResource MultiBoolAndToVisibilityConverter}">
+											<Binding
+												Converter="{StaticResource BankLinkStatusIsConverterParameterConverter}"
+												ConverterParameter="{x:Static models:BankLinkStatus.Linking}"
+												Path="LinkStatus" />
+										</MultiBinding>
+									</controls:CircularProgressBar.Visibility>
+								</controls:CircularProgressBar>
 							</Grid>
-							<!--#endregion-->
 						</controls:ExtendedButton>
+						<!--#endregion-->
+
 						<!--#region Import data button-->
 						<controls:ExtendedButton
 							Grid.Column="3"

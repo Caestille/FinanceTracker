@@ -6,12 +6,12 @@ using System.Windows.Data;
 
 namespace FinanceTracker.Converters
 {
-	public class BankLinkStatusIsConverterParameterVisibilityConverter : IValueConverter
+	public class BankLinkStatusIsConverterParameterConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
 			var match = (BankLinkStatus)value == (BankLinkStatus)parameter;
-			return match ? Visibility.Visible : Visibility.Collapsed;
+			return match;
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
