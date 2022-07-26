@@ -262,12 +262,12 @@
 							BorderThickness="0"
 							Command="{Binding LinkBankCommand}"
 							CornerRadius="5"
+							DisabledBackgroundColour="{DynamicResource StatusTextLightBrush}"
+							DisabledForegroundColour="{DynamicResource StatusTextBrush}"
 							Foreground="{DynamicResource TextBrush}"
 							IsEnabled="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterConverter}, ConverterParameter={x:Static models:BankLinkStatus.NotLinked}}"
 							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
 							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
-							DisabledBackgroundColour="{DynamicResource StatusTextLightBrush}"
-							DisabledForegroundColour="{DynamicResource StatusTextBrush}"
 							ToolTip="Link bank using TrueLayer (opens in browser)">
 							<!--#region Button contents-->
 							<Grid>
