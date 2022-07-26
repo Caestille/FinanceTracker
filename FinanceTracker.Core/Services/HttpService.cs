@@ -58,12 +58,24 @@ namespace FinanceTracker.Core.Services
             return contentArray.First(x => x.Split(':')[0].Contains(valueName)).Split(':')[1].Replace("\"", "").Trim(new char[] { '{', '}' });
         }
 
-        public async Task<(HttpStatusCode, string)> SendAsyncDisposeAndGetResponse(HttpRequestMessage request)
+        public async Task<(HttpStatusCode, string)> SendAsyncDisposeAndGetResponse(HttpRequestMessage request, CancellationToken? token)
 		{
-			var response = await httpClient.SendAsync(request);
-			request.Dispose();
+            HttpResponseMessage response = null;
+            try
+            {
+                response = await httpClient.SendAsync(request).AsCancellable(token ?? CancellationToken.None);
+            }
+            catch (TaskCanceledException)
+            {
+                // Task was cancelled
+            }
+            finally
+            {
+                request.Dispose();
+            }
 
-			return (response.StatusCode, await response.Content.ReadAsStringAsync());
+			return (response != null ? response.StatusCode : HttpStatusCode.TooManyRequests, 
+                response != null ? await response.Content.ReadAsStringAsync() : string.Empty);
 		}
 	}
 }
