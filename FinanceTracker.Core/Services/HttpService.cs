@@ -68,6 +68,7 @@ namespace FinanceTracker.Core.Services
             catch (TaskCanceledException)
             {
                 // Task was cancelled
+                // TODO: Logging
             }
             finally
             {

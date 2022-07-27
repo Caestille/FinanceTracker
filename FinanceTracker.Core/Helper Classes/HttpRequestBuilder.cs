@@ -3,7 +3,7 @@ using FinanceTracker.Core.Interfaces;
 using System.Net.Http.Headers;
 using System.Text;
 
-namespace FinanceTracker.Core.Services
+namespace FinanceTracker.Core.HelperClasses
 {
 	public class HttpRequestBuilder : IHttpRequestBuilder
 	{
