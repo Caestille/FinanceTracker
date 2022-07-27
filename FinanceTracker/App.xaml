@@ -10,13 +10,10 @@
 			</ResourceDictionary.MergedDictionaries>
 
 			<FontFamily x:Key="OpenSans">/Fonts/#Open Sans</FontFamily>
-			<converters:LeftPaddingConverter x:Key="LeftPaddingConverter" />
+
+			<converters:MenuLeftPaddingConverter x:Key="MenuLeftPaddingConverter" />
 			<converters:BankNameIconConverter x:Key="BankNameIconConverter" />
-			<converters:VisibleIfNotNullConverter x:Key="VisibleIfNotNullConverter" />
-			<converters:MultiBoolAndToVisibilityConverter x:Key="MultiBoolAndToVisibilityConverter" />
-			<converters:MultiBoolOrToVisibilityConverter x:Key="MultiBoolOrToVisibilityConverter" />
 			<converters:CurrencyFormatterConverter x:Key="CurrencyFormatterConverter" />
-			<converters:VisibilityInverterConverter x:Key="VisibilityInverterConverter" />
 			<converters:BankLinkStatusIsConverterParameterConverter x:Key="BankLinkStatusIsConverterParameterConverter" />
 		</ResourceDictionary>
 	</Application.Resources>
