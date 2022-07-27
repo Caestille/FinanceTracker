@@ -189,7 +189,7 @@
 							</Border>
 							<Label
 								Grid.Column="1"
-								Padding="{Binding Level, Converter={StaticResource LeftPaddingConverter}, ConverterParameter=15}"
+								Padding="{Binding Level, Converter={StaticResource MenuLeftPaddingConverter}, ConverterParameter=15}"
 								VerticalAlignment="Center"
 								Content="{Binding Name}"
 								Foreground="{DynamicResource TextBrush}"

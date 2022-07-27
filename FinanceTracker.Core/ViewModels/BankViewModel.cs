@@ -2,7 +2,6 @@
 using System.Windows.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
 using FinanceTracker.Core.Messages;
-using FinanceTracker.Core.Services;
 using FinanceTracker.Core.Interfaces;
 using CoreUtilities.Interfaces;
 using FinanceTracker.Core.Models;
@@ -12,15 +11,16 @@ namespace FinanceTracker.Core.ViewModels
 	public class BankViewModel : ViewModelBase
 	{
 		private IBankApiService truelayerService;
+		private IRegistryService registryService;
+
 		private const string defaultBankName = "Unnamed Bank";
 		private Guid bankGuid;
-		private IRegistryService registryService;
 
 		public ICommand EditNameCommand => new RelayCommand(EditName);
 		public ICommand NameEditorKeyDownCommand => new RelayCommand<object>(NameEditorKeyDown);
 		public ICommand CancelTaskCommand => new RelayCommand(CancelTask);
-
 		public ICommand LinkBankCommand => new AsyncRelayCommand(async () => { await LinkBank(); });
+		public ICommand UnlinkBankCommand => new AsyncRelayCommand(async () => { await UnlinkBank(); });
 
 		private bool isEditingName;
 		public bool IsEditingName
@@ -132,6 +132,11 @@ namespace FinanceTracker.Core.ViewModels
 			var result = await truelayerService.LinkBank(bankGuid, cancellationTokenSource.Token);
 			await Task.Delay(2000);
 			CancellationTokenSource = null;
+		}
+
+		private async Task UnlinkBank()
+		{
+			await truelayerService.DeleteLink(bankGuid);
 		}
 
 		private void CancelTask()

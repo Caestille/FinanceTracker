@@ -253,7 +253,7 @@
 						</Grid.ColumnDefinitions>
 						<!--#region Link bank button-->
 						<controls:ExtendedButton
-							Grid.Column="1"
+							Grid.Column="0"
 							Margin="0,6,0,3"
 							Padding="6,3"
 							HorizontalAlignment="Left"
@@ -265,10 +265,21 @@
 							DisabledBackgroundColour="{DynamicResource StatusTextLightBrush}"
 							DisabledForegroundColour="{DynamicResource StatusTextBrush}"
 							Foreground="{DynamicResource TextBrush}"
-							IsEnabled="{Binding LinkStatus, Converter={StaticResource BankLinkStatusIsConverterParameterConverter}, ConverterParameter={x:Static models:BankLinkStatus.NotLinked}}"
 							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
 							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
 							ToolTip="Link bank using TrueLayer (opens in browser)">
+							<controls:ExtendedButton.IsEnabled>
+								<MultiBinding Converter="{StaticResource MultiBoolOrConverter}">
+									<Binding
+										Converter="{StaticResource BankLinkStatusIsConverterParameterConverter}"
+										ConverterParameter="{x:Static models:BankLinkStatus.NotLinked}"
+										Path="LinkStatus" />
+									<Binding
+										Converter="{StaticResource BankLinkStatusIsConverterParameterConverter}"
+										ConverterParameter="{x:Static models:BankLinkStatus.Linking}"
+										Path="LinkStatus" />
+								</MultiBinding>
+							</controls:ExtendedButton.IsEnabled>
 							<!--#region Button contents-->
 							<Grid>
 								<Grid.ColumnDefinitions>
@@ -286,6 +297,9 @@
 												<Trigger Property="IsEnabled" Value="False">
 													<Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=DisabledForegroundColour}" />
 												</Trigger>
+												<Trigger Property="IsEnabled" Value="True">
+													<Setter Property="Foreground" Value="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=Foreground}" />
+												</Trigger>
 											</Style.Triggers>
 										</Style>
 									</Label.Style>
@@ -302,6 +316,11 @@
 									BorderThickness="0"
 									CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
 									ToolTip="TrueLayer API poll successful">
+									<Border.Style>
+										<Style>
+											<Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+										</Style>
+									</Border.Style>
 									<Border.Visibility>
 										<MultiBinding Converter="{StaticResource MultiBoolAndToVisibilityConverter}">
 											<Binding
@@ -343,6 +362,11 @@
 									BorderThickness="0"
 									CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
 									ToolTip="TrueLayer API poll failed">
+									<Border.Style>
+										<Style>
+											<Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+										</Style>
+									</Border.Style>
 									<Border.Visibility>
 										<MultiBinding Converter="{StaticResource MultiBoolAndToVisibilityConverter}">
 											<Binding
@@ -446,9 +470,92 @@
 							<!--#endregion-->
 						</controls:ExtendedButton>
 						<!--#endregion-->
+						<!--#region Unlink bank button-->
+						<controls:ExtendedButton
+							Grid.Column="1"
+							Width="16"
+							Height="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}"
+							Margin="6,0,0,0"
+							Padding="-3,-3"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Center"
+							Background="{DynamicResource ControlNonClickablePartBrush}"
+							BorderThickness="0"
+							Command="{Binding UnlinkBankCommand}"
+							CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+							Foreground="{DynamicResource StatusTextBrush}"
+							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
+							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
+							ToolTip="Unlink bank from FinanceTracker">
+							<controls:ExtendedButton.Visibility>
+								<MultiBinding Converter="{StaticResource MultiBoolAndToVisibilityConverter}">
+									<Binding
+										Converter="{StaticResource BankLinkStatusIsConverterParameterConverter}"
+										ConverterParameter="{x:Static models:BankLinkStatus.LinkVerified}"
+										Path="LinkStatus" />
+								</MultiBinding>
+							</controls:ExtendedButton.Visibility>
+							<Grid
+								Width="6"
+								Height="6"
+								HorizontalAlignment="Center"
+								VerticalAlignment="Center">
+								<Line
+									Stroke="White"
+									StrokeThickness="1"
+									X1="0"
+									X2="6"
+									Y1="0"
+									Y2="6" />
+								<Line
+									Stroke="White"
+									StrokeThickness="1"
+									X1="0"
+									X2="6"
+									Y1="6"
+									Y2="0" />
+							</Grid>
+						</controls:ExtendedButton>
+						<!--#endregion-->
+						<!--#region Link button helper-->
+						<Border
+							Grid.Column="2"
+							Width="16"
+							Height="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}"
+							Margin="6,0,0,0"
+							VerticalAlignment="Center"
+							Background="{DynamicResource StatusTextLightBrush}"
+							BorderThickness="0"
+							CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}">
+							<Border.Style>
+								<Style>
+									<Setter Property="ToolTipService.InitialShowDelay" Value="200" />
+								</Style>
+							</Border.Style>
+							<Border.ToolTip>
+								<ToolTip Content="FinanceTracker uses the TrueLayer API to&#x0a;retrieve your banking data. This means:&#x0a; 1. Financetracker interacts with your bank&#x0a;     only through TrueLayer, so is incapable&#x0a;     of doing anything trusted TrueLayer&#x0a;     services can't do.&#x0a; 2. Permission is consent based which&#x0a;     can be easily revoked by you at any time.&#x0a;     Consent automtically times out after 90&#x0a;     days, after which it will have to be&#x0a;     renewed.&#x0a;Additionally, FinanceTracker uses a level of&#x0a;TrueLayer which is incapable of anything&#x0a;except interacting with the limited data your&#x0a;bank grants to TrueLayer. It cannot make or&#x0a;receive transactions.&#x0a;&#x0a;Note: TrueLayer does not have access to&#x0a;every account type, so it may be necessary&#x0a;to import some data manually from .CSV&#x0a;files downloaded from your online banking." Style="{StaticResource InfoTooltip}" />
+							</Border.ToolTip>
+							<Grid>
+								<TextBlock
+									Margin="0,-2,0,0"
+									HorizontalAlignment="Center"
+									Foreground="{DynamicResource StatusTextBrush}"
+									FontWeight="Bold"
+									Text="?" />
+							</Grid>
+						</Border>
+						<!--#endregion-->
+						<!--#region Separator-->
+						<Border
+							Grid.Column="3"
+							Width="1"
+							Margin="10,10,10,6"
+							HorizontalAlignment="Left"
+							Background="{DynamicResource StatusTextBrush}" />
+						<!--#endregion-->
 						<!--#region Import data button-->
 						<controls:ExtendedButton
-							Grid.Column="3"
+							Grid.Column="4"
 							Margin="0,6,0,3"
 							Padding="6,3"
 							HorizontalAlignment="Left"
@@ -459,7 +566,7 @@
 							Foreground="{DynamicResource StatusTextBrush}"
 							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
 							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
-							ToolTip="Link bank using TrueLayer (opens in browser)">
+							ToolTip="Import data from .CSV">
 							<Grid>
 								<Grid.ColumnDefinitions>
 									<ColumnDefinition Width="Auto" />
@@ -472,14 +579,6 @@
 									Foreground="{DynamicResource TextBrush}" />
 							</Grid>
 						</controls:ExtendedButton>
-						<!--#endregion-->
-						<!--#region Separator-->
-						<Border
-							Grid.Column="2"
-							Width="1"
-							Margin="10,10,10,6"
-							HorizontalAlignment="Left"
-							Background="{DynamicResource StatusTextBrush}" />
 						<!--#endregion-->
 					</Grid>
 					<!--#endregion-->
