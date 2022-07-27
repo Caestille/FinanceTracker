@@ -161,6 +161,7 @@ namespace FinanceTracker.Core.Services
 						.WithContent("client_id", clientId)
 						.WithContent("client_secret", clientSecret)
 						.WithContent("refresh_token", bankLinks[bankGuid].RefreshToken)
+						.WithHeaderContentType("application/json")
 							.Build();
 
 				(HttpStatusCode status, string response) = await httpService.SendAsyncDisposeAndGetResponse(request, tokenSource.Token);

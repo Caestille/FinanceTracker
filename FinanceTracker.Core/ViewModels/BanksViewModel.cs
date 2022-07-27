@@ -2,11 +2,7 @@
 using CoreUtilities.Interfaces;
 using FinanceTracker.Core.Interfaces;
 using FinanceTracker.Core.Messages;
-using FinanceTracker.Core.Services;
-using FinanceTracker.Core.ViewModels;
-using Microsoft.Toolkit.Mvvm.Input;
 using Microsoft.Toolkit.Mvvm.Messaging;
-using System.Windows.Input;
 
 namespace FinanceTracker.Core.ViewModels
 {
@@ -32,6 +28,11 @@ namespace FinanceTracker.Core.ViewModels
 				ChildViewModels.Add(new BankViewModel(bankApiService, registryService, kvp.Value.ToString(), Guid.Parse(kvp.Key)));
 			}
 			NotifyBanksChanged();
+
+			if (ChildViewModels.Any())
+			{
+				IsShowingChildren = true;
+			}
 		}
 
 		protected override void AddChild()
