@@ -19,7 +19,6 @@
     <None Remove="Images\Natwest.png" />
     <None Remove="Images\Rbs.png" />
     <None Remove="Images\Santander.png" />
-    <None Remove="Images\SplashScreen.png" />
     <None Remove="Images\Vanguard.png" />
     <None Remove="ViewModels\MainViewModel.cs~RF556275.TMP" />
     <None Remove="Views\BankView.xaml~RF4955eb0.TMP" />
@@ -62,10 +61,6 @@
     <Resource Include="Images\Rbs.png" />
     <Resource Include="Images\Santander.png" />
     <Resource Include="Images\Vanguard.png" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <SplashScreen Include="Images\SplashScreen.png" />
   </ItemGroup>
 
   <ItemGroup>
