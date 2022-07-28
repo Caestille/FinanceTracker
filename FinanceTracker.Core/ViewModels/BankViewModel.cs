@@ -21,6 +21,7 @@ namespace FinanceTracker.Core.ViewModels
 		public ICommand CancelTaskCommand => new RelayCommand(CancelTask);
 		public ICommand LinkBankCommand => new AsyncRelayCommand(async () => { await LinkBank(); });
 		public ICommand UnlinkBankCommand => new AsyncRelayCommand(async () => { await UnlinkBank(); });
+		public ICommand DownloadDataCommand => new AsyncRelayCommand(async () => { await DownloadData(); });
 
 		private bool isEditingName;
 		public bool IsEditingName
@@ -137,6 +138,11 @@ namespace FinanceTracker.Core.ViewModels
 		private async Task UnlinkBank()
 		{
 			await truelayerService.DeleteLink(bankGuid);
+		}
+
+		private async Task DownloadData()
+		{
+			
 		}
 
 		private void CancelTask()

@@ -150,7 +150,8 @@
 					<RowDefinition Height="*" />
 				</Grid.RowDefinitions>
 				<!--#region Top bar-->
-				<Grid Grid.Row="0" Background="{DynamicResource MenuBrush}">
+				<Grid Background="{DynamicResource TextBrush}" Opacity="0.06" />
+				<Grid Grid.Row="0">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="Auto" />
 						<ColumnDefinition Width="Auto" />
@@ -251,9 +252,11 @@
 							<ColumnDefinition Width="Auto" />
 							<ColumnDefinition Width="Auto" />
 							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
 						<!--#region Link bank button-->
 						<controls:ExtendedButton
+							x:Name="LinkBankButton"
 							Grid.Column="0"
 							Margin="0,6,0,3"
 							Padding="10,3"
@@ -474,9 +477,9 @@
 						<!--#region Unlink bank button-->
 						<controls:ExtendedButton
 							Grid.Column="1"
-							Width="24"
+							Width="{Binding ElementName=LinkBankButton, Path=ActualHeight}"
 							Height="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}"
-							Margin="6,0,0,0"
+							Margin="6,6,0,3"
 							Padding="-3,-3"
 							HorizontalAlignment="Left"
 							VerticalAlignment="Center"
@@ -489,10 +492,14 @@
 							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
 							ToolTip="Unlink bank from FinanceTracker">
 							<controls:ExtendedButton.Visibility>
-								<MultiBinding Converter="{StaticResource MultiBoolAndToVisibilityConverter}">
+								<MultiBinding Converter="{StaticResource MultiBoolOrToVisibilityConverter}">
 									<Binding
 										Converter="{StaticResource BankLinkStatusIsConverterParameterConverter}"
 										ConverterParameter="{x:Static models:BankLinkStatus.LinkVerified}"
+										Path="LinkStatus" />
+									<Binding
+										Converter="{StaticResource BankLinkStatusIsConverterParameterConverter}"
+										ConverterParameter="{x:Static models:BankLinkStatus.LinkBroken}"
 										Path="LinkStatus" />
 								</MultiBinding>
 							</controls:ExtendedButton.Visibility>
@@ -521,9 +528,9 @@
 						<!--#region Link button helper-->
 						<Border
 							Grid.Column="2"
-							Width="24"
+							Width="{Binding ElementName=LinkBankButton, Path=ActualHeight}"
 							Height="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}"
-							Margin="6,4,0,0"
+							Margin="6,6,0,3"
 							VerticalAlignment="Center"
 							Background="{DynamicResource StatusTextLightBrush}"
 							BorderThickness="0"
@@ -533,6 +540,14 @@
 									<Setter Property="ToolTipService.InitialShowDelay" Value="200" />
 								</Style>
 							</Border.Style>
+							<Border.Visibility>
+								<MultiBinding Converter="{StaticResource MultiBoolAndToVisibilityConverter}">
+									<Binding
+										Converter="{StaticResource BankLinkStatusIsConverterParameterConverter}"
+										ConverterParameter="{x:Static models:BankLinkStatus.NotLinked}"
+										Path="LinkStatus" />
+								</MultiBinding>
+							</Border.Visibility>
 							<Border.ToolTip>
 								<ToolTip Content="FinanceTracker uses the TrueLayer API to&#x0a;retrieve your banking data. This means:&#x0a; 1. Financetracker interacts with your bank&#x0a;     only through TrueLayer, so is incapable&#x0a;     of doing anything trusted TrueLayer&#x0a;     services can't do.&#x0a; 2. Permission is consent based which&#x0a;     can be easily revoked by you at any time.&#x0a;     Consent automtically times out after 90&#x0a;     days, after which it will have to be&#x0a;     renewed.&#x0a;Additionally, FinanceTracker uses a level of&#x0a;TrueLayer which is incapable of anything&#x0a;except interacting with the limited data your&#x0a;bank grants to TrueLayer. It cannot make or&#x0a;receive transactions.&#x0a;&#x0a;Note: TrueLayer does not have access to&#x0a;every account type, so it may be necessary&#x0a;to import some data manually from .CSV&#x0a;files downloaded from your online banking." Style="{StaticResource InfoTooltip}" />
 							</Border.ToolTip>
@@ -547,9 +562,71 @@
 							</Grid>
 						</Border>
 						<!--#endregion-->
+						<!--#region Download data button-->
+						<controls:ExtendedButton
+							Grid.Column="3"
+							Width="{Binding ElementName=LinkBankButton, Path=ActualHeight}"
+							Height="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}"
+							Margin="6,6,0,3"
+							Padding="-3,-3"
+							HorizontalAlignment="Left"
+							VerticalAlignment="Center"
+							Background="{DynamicResource ControlNonClickablePartBrush}"
+							BorderThickness="0"
+							Command="{Binding DownloadDataCommand}"
+							CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+							Foreground="{DynamicResource StatusTextBrush}"
+							MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
+							MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
+							ToolTip="Download bank data from TrueLayer">
+							<controls:ExtendedButton.Visibility>
+								<MultiBinding Converter="{StaticResource MultiBoolOrToVisibilityConverter}">
+									<Binding
+										Converter="{StaticResource BankLinkStatusIsConverterParameterConverter}"
+										ConverterParameter="{x:Static models:BankLinkStatus.LinkVerified}"
+										Path="LinkStatus" />
+								</MultiBinding>
+							</controls:ExtendedButton.Visibility>
+							<Grid
+								Width="10"
+								Height="13"
+								HorizontalAlignment="Center"
+								VerticalAlignment="Center">
+								<Border
+									Width="10"
+									Height="4"
+									VerticalAlignment="Bottom"
+									Background="White" />
+								<Border
+									Width="8"
+									Height="3"
+									Margin="0,0,0,1"
+									VerticalAlignment="Bottom"
+									Background="{DynamicResource ControlNonClickablePartBrush}" />
+								<Border
+									Width="6"
+									Height="6"
+									Margin="0,0,0,5"
+									VerticalAlignment="Bottom"
+									Background="White"
+									CornerRadius="100,0,0,0"
+									RenderTransformOrigin="0.5,0.5">
+									<Border.RenderTransform>
+										<RotateTransform Angle="45" />
+									</Border.RenderTransform>
+								</Border>
+								<Border
+									Width="3"
+									Height="5"
+									Margin="0,0,0,8"
+									VerticalAlignment="Bottom"
+									Background="White" />
+							</Grid>
+						</controls:ExtendedButton>
+						<!--#endregion-->
 						<!--#region Separator-->
 						<Border
-							Grid.Column="3"
+							Grid.Column="4"
 							Width="1"
 							Margin="10,13,10,9"
 							HorizontalAlignment="Left"
@@ -557,7 +634,7 @@
 						<!--#endregion-->
 						<!--#region Import data button-->
 						<controls:ExtendedButton
-							Grid.Column="4"
+							Grid.Column="5"
 							Margin="0,6,0,3"
 							Padding="10,3"
 							HorizontalAlignment="Left"

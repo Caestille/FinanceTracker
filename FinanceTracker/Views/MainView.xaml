@@ -35,14 +35,14 @@
 				AutoReverse="False"
 				Storyboard.TargetProperty="Margin"
 				From="-250,0,0,0"
-				To="0,0,0,0"
+				To="1,0,0,0"
 				Duration="0:0:0.1" />
 		</Storyboard>
 		<Storyboard x:Key="MenuCloseAnimation">
 			<ThicknessAnimation
 				AutoReverse="False"
 				Storyboard.TargetProperty="Margin"
-				From="0,0,0,0"
+				From="1,0,0,0"
 				To="-250,0,0,0"
 				Duration="0:0:0.1" />
 		</Storyboard>
@@ -193,7 +193,18 @@
 								VerticalAlignment="Center"
 								Content="{Binding Name}"
 								Foreground="{DynamicResource TextBrush}"
-								IsHitTestVisible="False" />
+								IsHitTestVisible="False">
+								<!--<Label.Style>
+									<Style>
+										<Style.Triggers>
+											<DataTrigger Binding="{Binding IsSelected}" Value="True">
+												<Setter Property="Label.FontWeight" Value="ExtraBold" />
+												<Setter Property="Label.FontSize" Value="14" />
+											</DataTrigger>
+										</Style.Triggers>
+									</Style>
+								</Label.Style>-->
+							</Label>
 						</Grid>
 						<!--#endregion-->
 						<!--#region Add child button-->
