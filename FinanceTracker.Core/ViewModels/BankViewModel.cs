@@ -132,7 +132,6 @@ namespace FinanceTracker.Core.ViewModels
 			CancellationTokenSource = new CancellationTokenSource();
 			var result = await truelayerService.LinkBank(bankGuid, cancellationTokenSource.Token);
 			await Task.Delay(2000);
-			CancellationTokenSource = null;
 		}
 
 		private async Task UnlinkBank()
@@ -142,7 +141,12 @@ namespace FinanceTracker.Core.ViewModels
 
 		private async Task DownloadData()
 		{
-			
+			var results = new List<TransactionModel>();
+			var accounts = await truelayerService.GetAccounts(bankGuid);
+			foreach (var account in accounts)
+			{
+				results.AddRange(await truelayerService.GetTransactions(account));
+			}
 		}
 
 		private void CancelTask()

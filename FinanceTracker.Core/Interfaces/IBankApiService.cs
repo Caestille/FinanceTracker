@@ -11,5 +11,9 @@ namespace FinanceTracker.Core.Interfaces
 		void ReloadBankLinkDetails(Guid bankGuid);
 
 		Task DeleteLink(Guid bankGuid);
+
+		Task<IEnumerable<string>> GetAccounts(Guid bankGuid);
+
+		Task<IEnumerable<TransactionModel>> GetTransactions(string accountName);
 	}
 }

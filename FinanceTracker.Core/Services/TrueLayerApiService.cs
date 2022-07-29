@@ -35,6 +35,8 @@ namespace FinanceTracker.Core.Services
 			bankLinkValidationTimer.Start();
 		}
 
+		#region Linking
+
 		public async Task<bool> LinkBank(Guid bankGuid, CancellationToken token)
 		{
 			var linkedBank = new LinkedBankModel(registryService, bankGuid);
@@ -196,6 +198,26 @@ namespace FinanceTracker.Core.Services
 				return status == HttpStatusCode.OK && httpService.QueryValueFromResponse("client_id", response) == clientId;
 			}) ? BankLinkStatus.LinkVerified : BankLinkStatus.LinkBroken;
 		}
+
+		#endregion
+
+		#region Download data
+
+		public async Task<IEnumerable<string>> GetAccounts(Guid bankGuid)
+		{
+			var results = new List<string>();
+
+			return results;
+		}
+
+		public async Task<IEnumerable<TransactionModel>> GetTransactions(string accountName)
+		{
+			var results = new List<TransactionModel>();
+
+			return results;
+		}
+
+		#endregion
 
 		private async void BankLinkValidationTimer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
 		{
