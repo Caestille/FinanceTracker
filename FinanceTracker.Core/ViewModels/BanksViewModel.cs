@@ -20,7 +20,7 @@ namespace FinanceTracker.Core.ViewModels
 
 		public BanksViewModel(IBankApiService bankApiService, IRegistryService registryService)
 			: base("Banks", new Func<ViewModelBase>(
-				() => new BankViewModel(bankApiService, registryService, "Unnamed Bank"))) 
+				() => new BankViewModel(bankApiService, registryService, "Unnamed Bank", Guid.NewGuid()))) 
 		{
 			var existingBanks = registryService.GetAllSettingsInPath(@"\Banks");
 			foreach (var kvp in existingBanks)
@@ -35,7 +35,7 @@ namespace FinanceTracker.Core.ViewModels
 			}
 		}
 
-		protected override void AddChild()
+		protected override void AddChild(ViewModelBase vmToAdd = null, string name = "")
 		{
 			base.AddChild();
 			NotifyBanksChanged();

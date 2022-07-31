@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using SharpVectors.Converters;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
@@ -23,16 +24,16 @@ namespace FinanceTracker.Views
 			if (relativePoint == null)
 				return;
 
-			BlurHost.OffsetX = relativePoint.Value.X;
-			BlurHost.DrawBlurredElementBackground();
+			//BlurHost.OffsetX = relativePoint.Value.X;
+			//BlurHost.DrawBlurredElementBackground();
 
 			if (relativePoint.Value.X > 40)
 			{
-				ShadowGrid.Margin = new Thickness(-1, 0, 0, 0);
+				//ShadowGrid.Margin = new Thickness(-1, 0, 0, 0);
 			}
 			else
 			{
-				ShadowGrid.Margin = new Thickness(-35, 0, 0, 0);
+				//ShadowGrid.Margin = new Thickness(-35, 0, 0, 0);
 			}
 		}
 

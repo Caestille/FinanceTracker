@@ -4,14 +4,21 @@ using System.Windows.Input;
 using Microsoft.Toolkit.Mvvm.Input;
 using FinanceTracker.Core.Messages;
 using Microsoft.Toolkit.Mvvm.Messaging;
+using FinanceTracker.Core.Interfaces;
+using CoreUtilities.Interfaces;
 
 namespace FinanceTracker.Core.ViewModels
 {
 	public class AccountViewModel : ViewModelBase
 	{
-		private const string defaultBankName = "Unnamed Account";
+		private IBankApiService truelayerService;
+		private IRegistryService registryService;
 
-		public ICommand SetVisibleAccountCommand => new RelayCommand(SetVisibleAccount);
+		private const string defaultAccountName = "Unnamed Account";
+		private Guid accountGuid;
+		private Guid parentBankGuid;
+
+		public ICommand SetVisibleAccountCommand => new RelayCommand(Select);
 		public ICommand RequestCloseCommand => new RelayCommand(RequestClose);
 		public ICommand EditNameCommand => new RelayCommand(EditName);
 		public ICommand NameEditorKeyDownCommand => new RelayCommand<object>(NameEditorKeyDown);
@@ -21,6 +28,13 @@ namespace FinanceTracker.Core.ViewModels
 		{
 			get => transactions;
 			set => SetProperty(ref transactions, value);
+		}
+
+		private bool isCreditCard;
+		public bool IsCreditCard
+		{
+			get => isCreditCard;
+			set => SetProperty(ref isCreditCard, value);
 		}
 
 		private bool isEditingName;
@@ -44,13 +58,54 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref total, value);
 		}
 
-		public AccountViewModel(string name) : base(name) { SupportsDeleting = true; }
+		private string originalName;
+		public string OriginalName
+		{
+			get => originalName;
+			set
+			{
+				originalName = value;
+				registryService.SetSetting(accountGuid.ToString(), $"{Name}|{OriginalName}", $@"\Banks\{parentBankGuid}\Accounts");
+			}
+		}
+
+		public AccountViewModel(IBankApiService bankApiService, IRegistryService registryService, string name, Guid parentBankGuid, Guid accountGuid) : base(name)
+		{
+			this.registryService = registryService;
+			truelayerService = bankApiService;
+
+			this.accountGuid = accountGuid;
+			this.parentBankGuid = parentBankGuid;
+			OriginalName = name;
+
+			SupportsDeleting = true; 
+		}
+
+		public async Task DownloadTransactions()
+		{
+			var what = await truelayerService.GetTransactions(parentBankGuid, OriginalName);
+			Total = what.First().RunningBalance.Amount;
+		}
+
+		protected override void Select()
+		{
+			Messenger.Send(new AccountViewModelRequestShowMessage(this));
+			//var parent = BankData.First(x => x.ChildViewModels.Any(y => y.Name == this.Name));
+			//Messenger.Send(new ViewModelRequestShowMessage(parent));
+			this.IsSelected = true;
+		}
+
+		protected override void RequestDelete()
+		{
+			registryService.DeleteSetting(accountGuid.ToString(), $@"\Banks\{parentBankGuid}\Accounts");
+			base.RequestDelete();
+		}
 
 		private void EditName()
 		{
 			if (!IsEditingName)
 			{
-				TemporaryName = Name == defaultBankName ? string.Empty : Name;
+				TemporaryName = Name == defaultAccountName ? string.Empty : Name;
 				IsEditingName = true;
 			}
 			else
@@ -67,27 +122,16 @@ namespace FinanceTracker.Core.ViewModels
 				if (e.Key == Key.Enter)
 				{
 					Name = TemporaryName;
+					registryService.SetSetting(accountGuid.ToString(), $"{Name}|{OriginalName}", $@"\Banks\{parentBankGuid}\Accounts");
 				}
 
 				IsEditingName = false;
 			}
 		}
 
-		private void SetVisibleAccount()
-		{
-			Messenger.Send(new AccountViewModelRequestShowMessage(this));
-		}
-
 		private void RequestClose()
 		{
 			Messenger.Send(new AccountViewModelRequestShowMessage(null));
-		}
-
-		protected override void Select()
-		{
-			var parent = BankData.First(x => x.ChildViewModels.Any(y => y.Name == this.Name));
-			Messenger.Send(new ViewModelRequestShowMessage(parent));
-			parent.VisibleAccount = this;
 		}
 	}
 }

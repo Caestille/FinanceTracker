@@ -5,6 +5,9 @@ using FinanceTracker.Core.Messages;
 using FinanceTracker.Core.Interfaces;
 using CoreUtilities.Interfaces;
 using FinanceTracker.Core.Models;
+using System.Windows;
+using CoreUtilities.HelperClasses;
+using System.Collections.ObjectModel;
 
 namespace FinanceTracker.Core.ViewModels
 {
@@ -18,7 +21,7 @@ namespace FinanceTracker.Core.ViewModels
 
 		public ICommand EditNameCommand => new RelayCommand(EditName);
 		public ICommand NameEditorKeyDownCommand => new RelayCommand<object>(NameEditorKeyDown);
-		public ICommand CancelTaskCommand => new RelayCommand(CancelTask);
+		public ICommand CancelBankLinkCommand => new RelayCommand(CancelBankLink);
 		public ICommand LinkBankCommand => new AsyncRelayCommand(async () => { await LinkBank(); });
 		public ICommand UnlinkBankCommand => new AsyncRelayCommand(async () => { await UnlinkBank(); });
 		public ICommand DownloadDataCommand => new AsyncRelayCommand(async () => { await DownloadData(); });
@@ -53,6 +56,13 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref linkStatus, value);
 		}
 
+		private bool isDownloadingData;
+		public bool IsDownloadingData
+		{
+			get => isDownloadingData;
+			set => SetProperty(ref isDownloadingData, value);
+		}
+
 		private CancellationTokenSource cancellationTokenSource;
 		public CancellationTokenSource CancellationTokenSource
 		{
@@ -60,27 +70,62 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref cancellationTokenSource, value);
 		}
 
-		public BankViewModel(IBankApiService bankApiService, IRegistryService registryService, string name, Guid? guid = null) : base(name, new Func<ViewModelBase>(() => new AccountViewModel("Unnamed Account")))
+		private AccountsViewModel accountsViewModel;
+		public AccountsViewModel AccountsViewModel
+		{
+			get => accountsViewModel;
+			set => SetProperty(ref accountsViewModel, value);
+		}
+
+		private AccountsViewModel creditCardsViewModel;
+		public AccountsViewModel CreditCardsViewModel
+		{
+			get => creditCardsViewModel;
+			set => SetProperty(ref creditCardsViewModel, value);
+		}
+
+
+		public BankViewModel(IBankApiService bankApiService, IRegistryService registryService, string name, Guid bankGuid) : base(name, new Func<ViewModelBase>(() => new AccountViewModel(bankApiService, registryService, "Unnamed Account", bankGuid, Guid.NewGuid())))
 		{
 			SupportsDeleting = true;
 
 			this.registryService = registryService;
 			truelayerService = bankApiService;
 			truelayerService.NewBankLinkStatusForGuid += TruelayerService_NewBankLinkStatusForGuid;
-			bankGuid = guid ?? Guid.NewGuid();
+			this.bankGuid = bankGuid;
 			registryService.SetSetting(bankGuid.ToString(), Name, @"\Banks");
-			if (guid != null)
-			{
-				truelayerService.ReloadBankLinkDetails(guid.Value);
-			}
+
+			AccountsViewModel = new AccountsViewModel(bankApiService, registryService, "Accounts", "Unnamed Account", bankGuid, false);
+			CreditCardsViewModel = new AccountsViewModel(bankApiService, registryService, "Credit Cards", "Unnamed Credit Card", bankGuid, true);
+
+			AddChild(AccountsViewModel);
+			AddChild(CreditCardsViewModel);
+
+			truelayerService.TryReloadBankLinkDetails(bankGuid);
+
+			Application.Current.Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
 		}
 
-		private void TruelayerService_NewBankLinkStatusForGuid(object? sender, (Guid, BankLinkStatus) e)
+		protected override void BindMessages()
 		{
-			if (e.Item1 == bankGuid)
+			Messenger.Register<AccountViewModelRequestShowMessage>(this, (sender, message) => { VisibleAccount = message.ViewModel; });
+			base.BindMessages();
+		}
+
+		protected override void RequestDelete()
+		{
+			truelayerService.DeleteLink(bankGuid);
+			registryService.DeleteSetting(bankGuid.ToString(), @"\Banks");
+			base.RequestDelete();
+		}
+
+		protected override void OnViewModelDelete(ViewModelBase viewModel)
+		{
+			if (VisibleAccount == viewModel)
 			{
-				LinkStatus = e.Item2;
+				VisibleAccount = null;
 			}
+			base.OnViewModelDelete(viewModel);
 		}
 
 		private void EditName()
@@ -111,19 +156,6 @@ namespace FinanceTracker.Core.ViewModels
 			}
 		}
 
-		protected override void BindMessages()
-		{
-			Messenger.Register<AccountViewModelRequestShowMessage>(this, (sender, message) => { VisibleAccount = message.ViewModel; });
-			base.BindMessages();
-		}
-
-		protected override void RequestDelete()
-		{
-			truelayerService.DeleteLink(bankGuid);
-			registryService.DeleteSetting(bankGuid.ToString(), @"\Banks");
-			base.RequestDelete();
-		}
-
 		private async Task LinkBank()
 		{
 			if (LinkStatus != BankLinkStatus.NotLinked)
@@ -141,17 +173,46 @@ namespace FinanceTracker.Core.ViewModels
 
 		private async Task DownloadData()
 		{
+			IsDownloadingData = true;
 			var results = new List<TransactionModel>();
 			var accounts = await truelayerService.GetAccounts(bankGuid);
-			foreach (var account in accounts)
+			await Parallel.ForEachAsync(accounts, async (account, token) =>
 			{
-				results.AddRange(await truelayerService.GetTransactions(account));
+				try
+				{
+					var name = account.DisplayName;
+					var childrenContainsAccount = ChildViewModels.Any(x => (x as AccountViewModel).OriginalName == name);
+					AccountViewModel? accountVm = Application.Current.Dispatcher.Invoke(() =>
+						childrenContainsAccount 
+							? ChildViewModels.First(x => (x as AccountViewModel).OriginalName == name) as AccountViewModel
+							: new AccountViewModel(truelayerService, registryService, name, bankGuid, Guid.NewGuid()));
+					if (!childrenContainsAccount && accountVm != null)
+					{
+						Application.Current.Dispatcher.Invoke(() => AddChild(accountVm));
+					}
+					accountVm?.DownloadTransactions();
+				}
+				catch { }
+			});
+			IsDownloadingData = false;
+		}
+
+		private void CancelBankLink()
+		{
+			CancellationTokenSource.Cancel();
+		}
+
+		private void TruelayerService_NewBankLinkStatusForGuid(object? sender, (Guid, BankLinkStatus) e)
+		{
+			if (e.Item1 == bankGuid)
+			{
+				LinkStatus = e.Item2;
 			}
 		}
 
-		private void CancelTask()
+		private void Dispatcher_ShutdownStarted(object? sender, EventArgs e)
 		{
-			CancellationTokenSource.Cancel();
+			truelayerService.Dispose();
 		}
 	}
 }

@@ -13,7 +13,7 @@ namespace FinanceTracker.Core.ViewModels
 		private Func<ViewModelBase> createChildFunc;
 
 		public ICommand SelectCommand => new RelayCommand(Select);
-		public ICommand AddChildCommand => new RelayCommand(AddChild);
+		public ICommand AddChildCommand => new RelayCommand(() => AddChild());
 		public ICommand RequestDeleteCommand => new RelayCommand(RequestDelete);
 
 		private string name;
@@ -67,13 +67,6 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref level, value);
 		}
 
-		private BitmapImage icon;
-		public BitmapImage Icon
-		{
-			get => icon;
-			set => SetProperty(ref icon, value);
-		}
-
 		protected IMessenger BaseMessenger => Messenger;
 
 		public ViewModelBase(string name, Func<ViewModelBase> createChild = null)
@@ -100,15 +93,7 @@ namespace FinanceTracker.Core.ViewModels
 
 			Messenger.Register<ViewModelRequestDeleteMessage>(this, (sender, message) =>
 			{
-				if (ChildViewModels.Contains(message.ViewModel))
-				{
-					ChildViewModels.Remove(message.ViewModel);
-
-					if (IsShowingChildren && !ChildViewModels.Any())
-					{
-						IsShowingChildren = false;
-					}
-				}
+				OnViewModelDelete(message.ViewModel);
 			});
 		}
 
@@ -117,6 +102,21 @@ namespace FinanceTracker.Core.ViewModels
 			if (viewModel != this)
 			{
 				IsSelected = false;
+			}
+		}
+
+		protected virtual void OnViewModelDelete(ViewModelBase viewModel)
+		{
+			if (ChildViewModels.Contains(viewModel))
+			{
+				ChildViewModels.Remove(viewModel);
+
+				if (IsShowingChildren && !ChildViewModels.Any())
+				{
+					IsShowingChildren = false;
+				}
+
+				OnPropertyChanged(nameof(ChildViewModels));
 			}
 		}
 
@@ -132,9 +132,15 @@ namespace FinanceTracker.Core.ViewModels
 			}
 		}
 
-		protected virtual void AddChild() 
+		protected virtual void AddChild(ViewModelBase viewModelToAdd = null, string name = "") 
 		{
-			ChildViewModels.Add(createChildFunc());
+			var viewModel = viewModelToAdd ?? createChildFunc();
+			if (name != string.Empty)
+			{
+				viewModel.Name = name;
+			}
+
+			ChildViewModels.Add(viewModel);
 
 			foreach (var vm in ChildViewModels)
 			{
