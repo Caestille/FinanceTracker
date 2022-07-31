@@ -12,7 +12,7 @@
 				<RowDefinition Height="Auto" />
 				<RowDefinition Height="Auto" />
 			</Grid.RowDefinitions>
-			<!--<Image Width="150" Source="/Images/EmptyWallet.png" />-->
+			<Image Width="150" Source="/Images/EmptyWallet.png" />
 			<Label
 				Grid.Row="1"
 				HorizontalContentAlignment="Center"
