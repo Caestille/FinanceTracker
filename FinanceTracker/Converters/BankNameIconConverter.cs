@@ -9,27 +9,26 @@ namespace FinanceTracker.Converters
 {
 	public class BankNameIconConverter : IValueConverter
 	{
-		List<string> availableBankNames = new()
+		List<KeyValuePair<string, string>> namesAndExtensions = new()
 		{
-			"Barclays",
-			"Halifax",
-			"Lloyds Tsb",
-			"Natwest",
-			"Rbs",
-			"Santander",
-			"Vanguard",
-			"Hsbc",
+			KeyValuePair.Create("Barclays", "svg"),
+			KeyValuePair.Create("Halifax", "svg"),
+			KeyValuePair.Create("Lloyds Tsb", "svg"),
+			KeyValuePair.Create("Natwest", "svg"),
+			KeyValuePair.Create("Rbs", "svg"),
+			KeyValuePair.Create("Santander", "svg"),
+			//KeyValuePair.Create("Vanguard", "png"),
+			KeyValuePair.Create("Hsbc", "svg"),
 		};
 
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
 			var bankName = (string)value;
-			var matchedBank = availableBankNames.FirstOrDefault(x => bankName?.IndexOf(x, StringComparison.OrdinalIgnoreCase) != -1);
-			if (matchedBank == null)
+			KeyValuePair<string, string>? matchedBank = namesAndExtensions.FirstOrDefault(x => bankName?.IndexOf(x.Key, StringComparison.OrdinalIgnoreCase) != -1);
+			if (matchedBank.Value.Key == null)
 				return null;
-			var uri = new Uri(@$"../Images/{matchedBank?.Replace(" ", "")}.png", UriKind.Relative);
-			var bitmap = new BitmapImage(uri);
-			return bitmap;
+			var uri = new Uri(@$"../Images/{matchedBank.Value.Key.Replace(" ", "")}.{matchedBank.Value.Value}", UriKind.Relative);
+			return uri;
 		}
 
 		public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
