@@ -117,6 +117,7 @@ namespace FinanceTracker.Core.ViewModels
 			{
 				VisibleAccount = message.ViewModel;
 			}
+			base.OnViewModelRequestShow(message);
 		}
 
 		protected override void OnViewModelDelete(ViewModelRequestDeleteMessage message)
