@@ -1,5 +1,6 @@
 ﻿using CoreUtilities.Interfaces;
 using System.ComponentModel;
+using System.Text.Json;
 
 namespace FinanceTracker.Core.Models
 {
@@ -92,6 +93,17 @@ namespace FinanceTracker.Core.Models
             }
         }
 
+        private Dictionary<string, string> accountNamesAndIds = new Dictionary<string, string>();
+        public Dictionary<string, string> AccountNamesAndIds
+		{
+            get => accountNamesAndIds;
+            set
+            {
+                accountNamesAndIds = value;
+                registryService.SetSetting(nameof(AccountNamesAndIds), JsonSerializer.Serialize(value), $@"\{guid}");
+            }
+        }
+
         public LinkedBankModel(IRegistryService registryService, Guid guid)
         {
             this.registryService = registryService;
@@ -113,6 +125,8 @@ namespace FinanceTracker.Core.Models
             RefreshToken = refreshToken;  
             registryService.TryGetSetting(nameof(AccessExpires), DateTime.Now, out var accessExpires, $@"\{guid}");
             AccessExpires = accessExpires;
+            registryService.TryGetSetting(nameof(AccountNamesAndIds), JsonSerializer.Serialize(new Dictionary<string, string>()), out var accountIds, $@"\{guid}");
+            AccountNamesAndIds = JsonSerializer.Deserialize<Dictionary<string, string>>(accountIds);
 
             return AuthorisationCode != string.Empty;
         }
