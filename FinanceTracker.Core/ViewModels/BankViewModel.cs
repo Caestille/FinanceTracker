@@ -40,8 +40,6 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref temporaryName, value);
 		}
 
-		public override bool SupportsAddingChildren => false;
-
 		private ViewModelBase visibleAccount;
 		public ViewModelBase VisibleAccount
 		{
@@ -85,7 +83,7 @@ namespace FinanceTracker.Core.ViewModels
 		}
 
 
-		public BankViewModel(IBankApiService bankApiService, IRegistryService registryService, string name, Guid bankGuid) : base(name, new Func<ViewModelBase>(() => new AccountViewModel(bankApiService, registryService, "Unnamed Account", bankGuid, Guid.NewGuid())))
+		public BankViewModel(IBankApiService bankApiService, IRegistryService registryService, string name, Guid bankGuid) : base(name)
 		{
 			SupportsDeleting = true;
 
@@ -106,26 +104,28 @@ namespace FinanceTracker.Core.ViewModels
 			Application.Current.Dispatcher.ShutdownStarted += Dispatcher_ShutdownStarted;
 		}
 
-		protected override void BindMessages()
-		{
-			Messenger.Register<AccountViewModelRequestShowMessage>(this, (sender, message) => { VisibleAccount = message.ViewModel; });
-			base.BindMessages();
-		}
-
-		protected override void RequestDelete()
+		protected override void OnRequestDelete()
 		{
 			truelayerService.DeleteLink(bankGuid);
 			registryService.DeleteSetting(bankGuid.ToString(), @"\Banks");
-			base.RequestDelete();
+			base.OnRequestDelete();
 		}
 
-		protected override void OnViewModelDelete(ViewModelBase viewModel)
+		protected override void OnViewModelRequestShow(ViewModelRequestShowMessage message)
 		{
-			if (VisibleAccount == viewModel)
+			if (message.Target == GetType())
+			{
+				VisibleAccount = message.ViewModel;
+			}
+		}
+
+		protected override void OnViewModelDelete(ViewModelRequestDeleteMessage message)
+		{
+			if (VisibleAccount == message.ViewModel && message.Target == GetType())
 			{
 				VisibleAccount = null;
 			}
-			base.OnViewModelDelete(viewModel);
+			base.OnViewModelDelete(message);
 		}
 
 		private void EditName()
@@ -181,14 +181,14 @@ namespace FinanceTracker.Core.ViewModels
 				try
 				{
 					var name = account.DisplayName;
-					var childrenContainsAccount = ChildViewModels.Any(x => (x as AccountViewModel).OriginalName == name);
+					var childrenContainsAccount = AccountsViewModel.ChildViewModels.Any(x => (x as AccountViewModel).OriginalName == name);
 					AccountViewModel? accountVm = Application.Current.Dispatcher.Invoke(() =>
 						childrenContainsAccount 
-							? ChildViewModels.First(x => (x as AccountViewModel).OriginalName == name) as AccountViewModel
-							: new AccountViewModel(truelayerService, registryService, name, bankGuid, Guid.NewGuid()));
+							? AccountsViewModel.ChildViewModels.First(x => (x as AccountViewModel).OriginalName == name) as AccountViewModel
+							: new AccountViewModel(truelayerService, registryService, name, bankGuid, Guid.NewGuid(), false));
 					if (!childrenContainsAccount && accountVm != null)
 					{
-						Application.Current.Dispatcher.Invoke(() => AddChild(accountVm));
+						Application.Current.Dispatcher.Invoke(() => AccountsViewModel.AddChild(accountVm));
 					}
 					accountVm?.DownloadTransactions();
 				}

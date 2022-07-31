@@ -35,7 +35,7 @@ namespace FinanceTracker.Core.ViewModels
 			}
 		}
 
-		protected override void AddChild(ViewModelBase vmToAdd = null, string name = "")
+		public override void AddChild(ViewModelBase vmToAdd = null, string name = "")
 		{
 			base.AddChild();
 			NotifyBanksChanged();

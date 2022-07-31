@@ -34,7 +34,11 @@ namespace FinanceTracker.Core.ViewModels
 		public bool IsCreditCard
 		{
 			get => isCreditCard;
-			set => SetProperty(ref isCreditCard, value);
+			set
+			{
+				SetProperty(ref isCreditCard, value);
+				registryService.SetSetting(accountGuid.ToString(), $"{Name}|{OriginalName}|{isCreditCard}", $@"\Banks\{parentBankGuid}\Accounts");
+			}
 		}
 
 		private bool isEditingName;
@@ -65,11 +69,11 @@ namespace FinanceTracker.Core.ViewModels
 			set
 			{
 				originalName = value;
-				registryService.SetSetting(accountGuid.ToString(), $"{Name}|{OriginalName}", $@"\Banks\{parentBankGuid}\Accounts");
+				registryService.SetSetting(accountGuid.ToString(), $"{Name}|{OriginalName}|{isCreditCard}", $@"\Banks\{parentBankGuid}\Accounts");
 			}
 		}
 
-		public AccountViewModel(IBankApiService bankApiService, IRegistryService registryService, string name, Guid parentBankGuid, Guid accountGuid) : base(name)
+		public AccountViewModel(IBankApiService bankApiService, IRegistryService registryService, string name, Guid parentBankGuid, Guid accountGuid, bool isCreditCard) : base(name)
 		{
 			this.registryService = registryService;
 			truelayerService = bankApiService;
@@ -77,6 +81,7 @@ namespace FinanceTracker.Core.ViewModels
 			this.accountGuid = accountGuid;
 			this.parentBankGuid = parentBankGuid;
 			OriginalName = name;
+			IsCreditCard = isCreditCard;
 
 			SupportsDeleting = true; 
 		}
@@ -89,16 +94,17 @@ namespace FinanceTracker.Core.ViewModels
 
 		protected override void Select()
 		{
-			Messenger.Send(new AccountViewModelRequestShowMessage(this));
-			//var parent = BankData.First(x => x.ChildViewModels.Any(y => y.Name == this.Name));
-			//Messenger.Send(new ViewModelRequestShowMessage(parent));
+			Messenger.Send(new ViewModelRequestShowMessage(this, typeof(BankViewModel)));
+			var parent = BankData.FirstOrDefault(x => x.ChildViewModels.Any(y => y.ChildViewModels.Any(z => z.Name == this.Name)));
+			if (parent != null)
+				Messenger.Send(new ViewModelRequestShowMessage(parent));
 			this.IsSelected = true;
 		}
 
-		protected override void RequestDelete()
+		protected override void OnRequestDelete()
 		{
 			registryService.DeleteSetting(accountGuid.ToString(), $@"\Banks\{parentBankGuid}\Accounts");
-			base.RequestDelete();
+			Messenger.Send(new ViewModelRequestDeleteMessage(this, typeof(BankViewModel)));
 		}
 
 		private void EditName()
@@ -122,7 +128,7 @@ namespace FinanceTracker.Core.ViewModels
 				if (e.Key == Key.Enter)
 				{
 					Name = TemporaryName;
-					registryService.SetSetting(accountGuid.ToString(), $"{Name}|{OriginalName}", $@"\Banks\{parentBankGuid}\Accounts");
+					registryService.SetSetting(accountGuid.ToString(), $"{Name}|{OriginalName}|{isCreditCard}", $@"\Banks\{parentBankGuid}\Accounts");
 				}
 
 				IsEditingName = false;
@@ -131,7 +137,7 @@ namespace FinanceTracker.Core.ViewModels
 
 		private void RequestClose()
 		{
-			Messenger.Send(new AccountViewModelRequestShowMessage(null));
+			Messenger.Send(new ViewModelRequestShowMessage(null, typeof(BankViewModel)));
 		}
 	}
 }

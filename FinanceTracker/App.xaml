@@ -355,6 +355,265 @@
 				</Grid>
 			</DataTemplate>
 			<!--#endregion End property store hacks-->
+			<!--#region Account menu item data template-->
+			<DataTemplate x:Key="AccountMenuItemDataTemplate" DataType="{x:Type vms:ViewModelBase}">
+				<Grid x:Name="MainGrid">
+					<StackPanel>
+						<!--#region Single item grid-->
+						<Grid>
+							<!--#region Divider-->
+							<Border
+								x:Name="Divider"
+								Height="1"
+								Margin="0,0,7,0"
+								VerticalAlignment="Bottom"
+								Background="{DynamicResource TextBrush}"
+								Opacity="0.2" />
+							<!--#endregion-->
+							<!--#region Menu Item Button-->
+							<Border>
+								<controls:ExtendedButton
+									x:Name="Button"
+									Width="200"
+									Height="{Binding ElementName=ContentGrid, Path=ActualHeight}"
+									MinHeight="40"
+									Margin="0,-1,0,0"
+									VerticalAlignment="Top"
+									HorizontalContentAlignment="Left"
+									HorizontalAlignment="Left"
+									Background="Transparent"
+									BorderThickness="0"
+									Command="{Binding SelectCommand}"
+									Foreground="{DynamicResource TextBrush}"
+									MouseDownColour="{DynamicResource MenuMouseDownBrush}"
+									MouseOverColour="{DynamicResource MenuMouseOverBrush}" />
+								<Border.Effect>
+									<DropShadowEffect
+										BlurRadius="30"
+										Opacity="0.6"
+										ShadowDepth="0"
+										Color="{DynamicResource InvertedTextColour}" />
+								</Border.Effect>
+							</Border>
+							<!--#endregion-->
+							<!--#region Menu item content-->
+							<Grid x:Name="ContentGrid">
+								<Grid.ColumnDefinitions>
+									<ColumnDefinition Width="Auto" />
+									<ColumnDefinition Width="Auto" />
+								</Grid.ColumnDefinitions>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="*" />
+									<RowDefinition Height="Auto" />
+								</Grid.RowDefinitions>
+								<Border
+									Grid.Column="0"
+									Width="33"
+									Height="{Binding RelativeSource={RelativeSource Self}, Path=ActualWidth}"
+									MaxWidth="25"
+									Margin="16,0,-15,0"
+									Padding="4"
+									HorizontalAlignment="Left"
+									VerticalAlignment="Center"
+									Background="{DynamicResource MainBackgroundBrush}"
+									CornerRadius="5"
+									IsHitTestVisible="False"
+									Visibility="{Binding ElementName=Image, Path=Source, Converter={StaticResource VisibleIfNotNullConverter}}">
+									<svgc:SvgViewbox x:Name="Image" Source="{Binding Name, Converter={StaticResource BankNameIconConverter}}" />
+								</Border>
+								<Label
+									Grid.Column="1"
+									Margin="-15,5,0,0"
+									Padding="{Binding Level, Converter={StaticResource MenuLeftPaddingConverter}, ConverterParameter=15}"
+									VerticalAlignment="Center"
+									Content="{Binding Name}"
+									Foreground="{DynamicResource TextBrush}"
+									IsHitTestVisible="False" />
+								<Label
+									Grid.Row="1"
+									Grid.Column="1"
+									Margin="-15,0,0,5"
+									Padding="{Binding Level, Converter={StaticResource MenuLeftPaddingConverter}, ConverterParameter=15}"
+									VerticalAlignment="Center"
+									Content="{Binding Total, Converter={StaticResource CurrencyFormatterConverter}}"
+									Foreground="{DynamicResource StatusTextBrush}"
+									IsHitTestVisible="False" />
+							</Grid>
+							<!--#endregion-->
+							<!--#region Add child button-->
+							<controls:ExtendedButton
+								Width="20"
+								Height="{Binding RelativeSource={RelativeSource Self}, Path=Width}"
+								Margin="0,0,32,0"
+								HorizontalAlignment="Right"
+								HorizontalContentAlignment="Stretch"
+								VerticalContentAlignment="Stretch"
+								Background="{DynamicResource ControlClickablePartBrush}"
+								BorderThickness="0"
+								Command="{Binding AddChildCommand}"
+								CornerRadius="{Binding RelativeSource={RelativeSource Self}, Path=Width, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+								MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
+								MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
+								Opacity="0.7"
+								SnapsToDevicePixels="True"
+								ToolTip="Add"
+								Visibility="{Binding SupportsAddingChildren, Converter={StaticResource VisibleIfTrueConverter}}">
+								<!--#region Button icon-->
+								<Grid Margin="-1">
+									<Line
+										IsHitTestVisible="False"
+										Stroke="{DynamicResource StatusTextBrush}"
+										StrokeThickness="2"
+										X1="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+										X2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+										Y1="3"
+										Y2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}" />
+									<Line
+										IsHitTestVisible="False"
+										Stroke="{DynamicResource StatusTextBrush}"
+										StrokeThickness="2"
+										X1="3"
+										X2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}"
+										Y1="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}"
+										Y2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualWidth, Converter={StaticResource ValueMultiplierConverter}, ConverterParameter=0.5}" />
+								</Grid>
+								<!--#endregion-->
+							</controls:ExtendedButton>
+							<!--#endregion-->
+							<!--#region Drop down indicator-->
+							<Grid
+								Width="10"
+								Height="10"
+								Margin="0,3,15,0"
+								HorizontalAlignment="Right"
+								IsHitTestVisible="False"
+								RenderTransformOrigin="0.5,0.5">
+								<Grid.Visibility>
+									<MultiBinding Converter="{StaticResource MultiBoolAndToVisibilityConverter}">
+										<Binding Converter="{StaticResource SequenceHasElementsBooleanConverter}" Path="ChildViewModels" />
+										<Binding Path="SupportsAddingChildren" />
+									</MultiBinding>
+								</Grid.Visibility>
+								<Grid.RenderTransform>
+									<RotateTransform>
+										<RotateTransform.Angle>
+											<MultiBinding Converter="{StaticResource ValueIfTrueValueIfFalseConverter}">
+												<Binding Path="IsShowingChildren" />
+												<Binding ElementName="RotateGrid" Path="Margin.Left" />
+												<Binding ElementName="RotateGrid" Path="Margin.Right" />
+											</MultiBinding>
+										</RotateTransform.Angle>
+									</RotateTransform>
+								</Grid.RenderTransform>
+								<Line
+									Stroke="{DynamicResource TextBrush}"
+									StrokeThickness="1"
+									X1="0"
+									X2="5.1"
+									Y1="2.5"
+									Y2="7.6" />
+								<Line
+									Stroke="{DynamicResource TextBrush}"
+									StrokeThickness="1"
+									X1="4.9"
+									X2="10"
+									Y1="7.4"
+									Y2="2.5" />
+							</Grid>
+							<!--#endregion-->
+							<!--#region Delete button-->
+							<controls:ExtendedButton
+								Width="20"
+								Height="{Binding RelativeSource={RelativeSource Self}, Path=Width}"
+								Margin="10,0"
+								HorizontalAlignment="Right"
+								VerticalAlignment="Center"
+								Background="{DynamicResource ControlClickablePartBrush}"
+								BorderThickness="0"
+								Command="{Binding RequestDeleteCommand}"
+								CornerRadius="12.5"
+								MouseDownColour="{DynamicResource ControlClickablePartMouseDownBrush}"
+								MouseOverColour="{DynamicResource ControlClickablePartMouseOverBrush}"
+								Opacity="0.7"
+								ToolTip="Delete"
+								Visibility="{Binding SupportsDeleting, Converter={StaticResource VisibleIfTrueConverter}}">
+								<controls:ExtendedButton.Style>
+									<Style TargetType="{x:Type controls:ExtendedButton}">
+										<Style.Triggers>
+											<Trigger Property="IsMouseOver" Value="False">
+												<Setter Property="Background" Value="White" />
+											</Trigger>
+										</Style.Triggers>
+									</Style>
+								</controls:ExtendedButton.Style>
+								<Grid>
+									<Border
+										Width="8"
+										Height="9"
+										Margin="0,5,0,0"
+										Background="{DynamicResource StatusTextBrush}"
+										BorderBrush="{DynamicResource StatusTextBrush}"
+										BorderThickness="2"
+										CornerRadius="0,0,1,1" />
+									<Border
+										Width="12"
+										Height="2"
+										Margin="0,2,0,0"
+										VerticalAlignment="Top"
+										BorderBrush="{DynamicResource StatusTextBrush}"
+										BorderThickness="2"
+										CornerRadius="0,0,3,3" />
+									<Border
+										Width="4"
+										Height="2"
+										Margin="0,0,0,0"
+										VerticalAlignment="Top"
+										BorderBrush="{DynamicResource StatusTextBrush}"
+										BorderThickness="2"
+										CornerRadius="0,0,3,3" />
+								</Grid>
+							</controls:ExtendedButton>
+							<!--#endregion-->
+							<!--#region Selection indicator-->
+							<Border
+								Width="6"
+								Margin="0,3,0,4"
+								HorizontalAlignment="Left"
+								Background="{DynamicResource ThemeBrush}"
+								CornerRadius="0,5,5,0"
+								Visibility="{Binding IsSelected, Converter={StaticResource VisibleIfTrueConverter}, UpdateSourceTrigger=PropertyChanged}" />
+							<!--#endregion-->
+						</Grid>
+						<!--#endregion-->
+						<!--#region Child items-->
+						<Grid Visibility="{Binding IsShowingChildren, Converter={StaticResource VisibleIfTrueConverter}}" Margin="6,0,0,10">
+							<Grid Background="{DynamicResource TextBrush}" Opacity="0.1" />
+							<ItemsControl
+								HorizontalAlignment="Left"
+								VerticalAlignment="Bottom"
+								ItemTemplate="{DynamicResource AccountMenuItemDataTemplate}"
+								ItemsSource="{Binding ChildViewModels, UpdateSourceTrigger=PropertyChanged}" />
+						</Grid>
+						<!--#endregion-->
+					</StackPanel>
+					<!--#region Property store hacks-->
+					<Grid
+						x:Name="RotateGrid"
+						Margin="180,0,0,0"
+						Visibility="Collapsed" />
+					<!--#endregion End property store hacks-->
+					<!--#region Linked items-->
+					<Border
+						Width="6"
+						Margin="0,0,0,10"
+						HorizontalAlignment="Left"
+						Background="{DynamicResource ControlClickablePartBrush}"
+						Opacity="1"
+						Visibility="{Binding IsShowingChildren, Converter={StaticResource VisibleIfTrueConverter}}" />
+					<!--#endregion-->
+				</Grid>
+			</DataTemplate>
+			<!--#endregion End property store hacks-->
 
 		</ResourceDictionary>
 	</Application.Resources>

@@ -696,10 +696,11 @@
 				<ScrollViewer VerticalScrollBarVisibility="Auto">
 					<Grid>
 						<ItemsControl
+							Width="200"
 							x:Name="ItemsControl"
 							Focusable="False"
-							ItemTemplate="{StaticResource MenuItemDataTemplate}"
-							ItemsSource="{Binding ChildViewModels}" />
+							ItemTemplate="{StaticResource AccountMenuItemDataTemplate}"
+							ItemsSource="{Binding ChildViewModels}"/>
 					</Grid>
 				</ScrollViewer>
 			</Grid>

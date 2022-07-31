@@ -14,7 +14,7 @@ namespace FinanceTracker.Core.ViewModels
 
 		public ICommand SelectCommand => new RelayCommand(Select);
 		public ICommand AddChildCommand => new RelayCommand(() => AddChild());
-		public ICommand RequestDeleteCommand => new RelayCommand(RequestDelete);
+		public ICommand RequestDeleteCommand => new RelayCommand(OnRequestDelete);
 
 		private string name;
 		public string Name
@@ -83,7 +83,7 @@ namespace FinanceTracker.Core.ViewModels
 		{
 			Messenger.Register<ViewModelRequestShowMessage>(this, (sender, message) => 
 			{
-				OnViewModelRequestShow(message.ViewModel);
+				OnViewModelRequestShow(message);
 			});
 
 			Messenger.Register<BanksUpdatedMessage>(this, (sender, message) =>
@@ -93,23 +93,23 @@ namespace FinanceTracker.Core.ViewModels
 
 			Messenger.Register<ViewModelRequestDeleteMessage>(this, (sender, message) =>
 			{
-				OnViewModelDelete(message.ViewModel);
+				OnViewModelDelete(message);
 			});
 		}
 
-		protected virtual void OnViewModelRequestShow(ViewModelBase viewModel)
+		protected virtual void OnViewModelRequestShow(ViewModelRequestShowMessage message)
 		{
-			if (viewModel != this)
+			if (message.ViewModel != this)
 			{
 				IsSelected = false;
 			}
 		}
 
-		protected virtual void OnViewModelDelete(ViewModelBase viewModel)
+		protected virtual void OnViewModelDelete(ViewModelRequestDeleteMessage message)
 		{
-			if (ChildViewModels.Contains(viewModel))
+			if (ChildViewModels.Contains(message.ViewModel))
 			{
-				ChildViewModels.Remove(viewModel);
+				ChildViewModels.Remove(message.ViewModel);
 
 				if (IsShowingChildren && !ChildViewModels.Any())
 				{
@@ -132,7 +132,7 @@ namespace FinanceTracker.Core.ViewModels
 			}
 		}
 
-		protected virtual void AddChild(ViewModelBase viewModelToAdd = null, string name = "") 
+		public virtual void AddChild(ViewModelBase viewModelToAdd = null, string name = "") 
 		{
 			var viewModel = viewModelToAdd ?? createChildFunc();
 			if (name != string.Empty)
@@ -183,7 +183,7 @@ namespace FinanceTracker.Core.ViewModels
 			}
 		}
 
-		protected virtual void RequestDelete()
+		protected virtual void OnRequestDelete()
 		{
 			Messenger.Send(new ViewModelRequestDeleteMessage(this));
 		}
