@@ -11,14 +11,22 @@
   <ItemGroup>
     <None Remove="Fonts\OpenSans-VariableFont_wdth,wght.ttf" />
     <None Remove="Images\Barclays.png" />
+    <None Remove="Images\Barclays.svg" />
     <None Remove="Images\EmptyWallet.png" />
     <None Remove="Images\FinanceTrackerIcon.png" />
     <None Remove="Images\Halifax.png" />
+    <None Remove="Images\Halifax.svg" />
     <None Remove="Images\HSBC.png" />
+    <None Remove="Images\Hsbc.svg" />
     <None Remove="Images\LloydsTsb.png" />
+    <None Remove="Images\LloydsTsb.svg" />
     <None Remove="Images\Natwest.png" />
+    <None Remove="Images\Natwest.svg" />
     <None Remove="Images\Rbs.png" />
+    <None Remove="Images\Rbs.svg" />
     <None Remove="Images\Santander.png" />
+    <None Remove="Images\Santander.svg" />
+    <None Remove="Images\SantanderIcon.svg" />
     <None Remove="Images\Vanguard.png" />
     <None Remove="ViewModels\MainViewModel.cs~RF556275.TMP" />
     <None Remove="Views\BankView.xaml~RF4955eb0.TMP" />
@@ -39,6 +47,7 @@
     <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-beta.300" />
     <PackageReference Include="Microsoft.Toolkit.Mvvm" Version="7.1.2" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.39" />
+    <PackageReference Include="SharpVectors" Version="1.8.0" />
   </ItemGroup>
 
   <ItemGroup>
@@ -51,15 +60,15 @@
     <Resource Include="Fonts\OpenSans-VariableFont_wdth,wght.ttf">
       <Pack>True</Pack>
     </Resource>
-    <Resource Include="Images\Barclays.png" />
+    <Resource Include="Images\Barclays.svg" />
     <Resource Include="Images\EmptyWallet.png" />
     <Resource Include="Images\FinanceTrackerIcon.png" />
-    <Resource Include="Images\Halifax.png" />
-    <Resource Include="Images\Hsbc.png" />
-    <Resource Include="Images\LloydsTsb.png" />
-    <Resource Include="Images\Natwest.png" />
-    <Resource Include="Images\Rbs.png" />
-    <Resource Include="Images\Santander.png" />
+    <Resource Include="Images\Halifax.svg" />
+    <Resource Include="Images\Hsbc.svg" />
+    <Resource Include="Images\LloydsTsb.svg" />
+    <Resource Include="Images\Natwest.svg" />
+    <Resource Include="Images\Rbs.svg" />
+    <Resource Include="Images\Santander.svg" />
     <Resource Include="Images\Vanguard.png" />
   </ItemGroup>
 
