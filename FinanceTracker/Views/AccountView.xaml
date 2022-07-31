@@ -64,7 +64,7 @@
 				Margin="0,7,0,3"
 				HorizontalAlignment="Left"
 				VerticalAlignment="Center"
-				Background="{DynamicResource ControlNonClickablePartBrush}"
+				Background="{DynamicResource ControlClickablePartBrush}"
 				BorderThickness="0"
 				Command="{Binding EditNameCommand}"
 				CornerRadius="5"
@@ -93,13 +93,13 @@
 						Y2="3" />
 				</Grid>
 			</controls:ExtendedButton>
-			<Border
+			<!--<Border
 				Grid.Row="1"
 				Grid.ColumnSpan="3"
 				Height="1"
 				HorizontalAlignment="Stretch"
 				VerticalAlignment="Top"
-				Background="{DynamicResource StatusTextBrush}" />
+				Background="{DynamicResource StatusTextBrush}" />-->
 		</Grid>
 		<controls:ExtendedButton
 			Width="40"
