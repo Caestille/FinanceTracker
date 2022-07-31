@@ -1,4 +1,5 @@
-﻿using FinanceTracker.Core.Models;
+﻿using FinanceTracker.Core.DataTypeObjects;
+using FinanceTracker.Core.Models;
 
 namespace FinanceTracker.Core.Interfaces
 {
@@ -8,12 +9,14 @@ namespace FinanceTracker.Core.Interfaces
 
 		Task<bool> LinkBank(Guid bankGuid, CancellationToken token);
 
-		void ReloadBankLinkDetails(Guid bankGuid);
+		void TryReloadBankLinkDetails(Guid bankGuid);
 
 		Task DeleteLink(Guid bankGuid);
 
-		Task<IEnumerable<string>> GetAccounts(Guid bankGuid);
+		Task<IEnumerable<AccountDto>> GetAccounts(Guid bankGuid);
 
-		Task<IEnumerable<TransactionModel>> GetTransactions(string accountName);
+		Task<IEnumerable<TransactionDto>> GetTransactions(Guid bankGuid, string accountId);
+
+		void Dispose();
 	}
 }

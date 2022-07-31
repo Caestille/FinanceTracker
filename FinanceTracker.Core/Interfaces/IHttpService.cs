@@ -8,8 +8,6 @@ namespace FinanceTracker.Core.Interfaces
 
 		IHttpRequestBuilder GetHttpRequestBuilder();
 
-		string QueryValueFromResponse(string valueName, string content);
-
 		Task<(HttpStatusCode, string)> SendAsyncDisposeAndGetResponse(HttpRequestMessage request, CancellationToken? token = null);
 	}
 }

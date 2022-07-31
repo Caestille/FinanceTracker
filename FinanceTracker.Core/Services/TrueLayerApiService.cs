@@ -1,8 +1,11 @@
 ﻿using CoreUtilities.Interfaces;
+using FinanceTracker.Core.DataTypeObjects;
 using FinanceTracker.Core.Interfaces;
 using FinanceTracker.Core.Models;
 using System.Diagnostics;
 using System.Net;
+using System.Text.Json;
+using System.Windows;
 
 namespace FinanceTracker.Core.Services
 {
@@ -80,7 +83,7 @@ namespace FinanceTracker.Core.Services
 			return success;
 		}
 
-		public void ReloadBankLinkDetails(Guid bankGuid)
+		public void TryReloadBankLinkDetails(Guid bankGuid)
 		{
 			BlockingPolicy(() =>
 			{
@@ -139,12 +142,13 @@ namespace FinanceTracker.Core.Services
 				if (!success)
 					return (success, string.Empty, string.Empty, DateTime.Now);
 
-				var accessToken = httpService.QueryValueFromResponse("access_token", response);
-				var expiresIn = DateTime.Now + TimeSpan.FromSeconds(int.Parse(httpService.QueryValueFromResponse("expires_in", response)));
-				var refreshToken = httpService.QueryValueFromResponse("refresh_token", response);
-				var tokenType = httpService.QueryValueFromResponse("token_type", response);
+				var tokenDetails = JsonSerializer.Deserialize<ConnectionOAuthTokenDto>(response);
 
-				success = tokenType == "Bearer";
+				var accessToken = tokenDetails.AccessToken;
+				var expiresIn = DateTime.Now + TimeSpan.FromSeconds(tokenDetails.ExpiresInS);
+				var refreshToken = tokenDetails.RefreshToken;
+				success = tokenDetails.TokenType == "Bearer";
+
 				return (success, accessToken, refreshToken, expiresIn);
 			});
 		}
@@ -173,12 +177,13 @@ namespace FinanceTracker.Core.Services
 				if (!success)
 					return false;
 
-				bankLinks[bankGuid].AccessToken = httpService.QueryValueFromResponse("access_token", response);
-				bankLinks[bankGuid].AccessExpires = DateTime.Now + TimeSpan.FromSeconds(int.Parse(httpService.QueryValueFromResponse("expires_in", response)));
-				bankLinks[bankGuid].RefreshToken = httpService.QueryValueFromResponse("refresh_token", response);
-				var tokenType = httpService.QueryValueFromResponse("token_type", response);
+				var tokenDetails = JsonSerializer.Deserialize<ConnectionOAuthTokenDto>(response);
 
-				success = tokenType == "Bearer";
+				bankLinks[bankGuid].AccessToken = tokenDetails.AccessToken;
+				bankLinks[bankGuid].AccessExpires = DateTime.Now + TimeSpan.FromSeconds(tokenDetails.ExpiresInS);
+				bankLinks[bankGuid].RefreshToken = tokenDetails.RefreshToken;
+
+				success = tokenDetails.TokenType == "Bearer";
 				return success;
 			});
 		}
@@ -194,8 +199,9 @@ namespace FinanceTracker.Core.Services
 							.Build();
 
 				(HttpStatusCode status, string response) = await httpService.SendAsyncDisposeAndGetResponse(request, tokenSource.Token);
+				var connectionData = JsonSerializer.Deserialize<ResultsHostDto<ConnectionMetadataDto>>(response).Results;
 
-				return status == HttpStatusCode.OK && httpService.QueryValueFromResponse("client_id", response) == clientId;
+				return status == HttpStatusCode.OK && connectionData.FirstOrDefault()?.ClientId == clientId;
 			}) ? BankLinkStatus.LinkVerified : BankLinkStatus.LinkBroken;
 		}
 
@@ -203,18 +209,86 @@ namespace FinanceTracker.Core.Services
 
 		#region Download data
 
-		public async Task<IEnumerable<string>> GetAccounts(Guid bankGuid)
+		public async Task<IEnumerable<AccountDto>> GetAccounts(Guid bankGuid)
 		{
-			var results = new List<string>();
+			return await BlockingPolicy(async () =>
+			{
+				var request = httpService.GetHttpRequestBuilder()
+					.CreateRequest(IHttpRequestBuilder.HttpCommandType.Get, "https://api.truelayer.com/data/v1/accounts")
+						.WithUnvalidatedHeader("Accept", "application/json")
+						.WithUnvalidatedHeader("Authorization", $"Bearer {bankLinks[bankGuid].AccessToken}")
+							.Build();
 
-			return results;
+				(HttpStatusCode status, string response) = await httpService.SendAsyncDisposeAndGetResponse(request, tokenSource.Token);
+
+				var success = status == HttpStatusCode.OK;
+
+				var result = new List<AccountDto>();
+
+				if (success)
+				{
+					var accounts = JsonSerializer.Deserialize<ResultsHostDto<AccountDto>>(response).Results;
+					Dictionary<string, string> accountIdMaps = new Dictionary<string, string>();
+					foreach (var account in accounts)
+					{
+						accountIdMaps[account.DisplayName] = account.AccountId;
+					}
+					bankLinks[bankGuid].AccountNamesAndIds = accountIdMaps;
+					result.AddRange(accounts);
+				}
+
+				return result;
+			});
 		}
 
-		public async Task<IEnumerable<TransactionModel>> GetTransactions(string accountName)
+		public static string GetPublicIP()
 		{
-			var results = new List<TransactionModel>();
+			try
+			{
+				string url = "http://checkip.dyndns.org";
+				System.Net.WebRequest req = System.Net.WebRequest.Create(url);
+				System.Net.WebResponse resp = req.GetResponse();
+				System.IO.StreamReader sr = new System.IO.StreamReader(resp.GetResponseStream());
+				string response = sr.ReadToEnd().Trim();
+				string[] a = response.Split(':');
+				string a2 = a[1].Substring(1);
+				string[] a3 = a2.Split('<');
+				string a4 = a3[0];
+				return a4;
+			}
+			catch
+			{
+				return "";
+			}
+		}
 
-			return results;
+		public async Task<IEnumerable<TransactionDto>> GetTransactions(Guid bankGuid, string accountName)
+		{
+			return await BlockingPolicy(async () =>
+			{
+				var accountId = bankLinks[bankGuid].AccountNamesAndIds[accountName];
+
+				var result = new List<TransactionDto>();
+				var request = httpService.GetHttpRequestBuilder()
+				.CreateRequest(IHttpRequestBuilder.HttpCommandType.Get,
+					$"https://api.truelayer.com/data/v1/accounts/{accountId}/transactions?to={(DateTime.Now - TimeSpan.FromHours(6)).ToString("yyyy-MM-dd")}&from={(DateTime.Now - TimeSpan.FromDays(2 * 367)).ToString("yyyy-MM-dd")}")
+					.WithUnvalidatedHeader("Accept", "application/json")
+					.WithUnvalidatedHeader("Authorization", $"Bearer {bankLinks[bankGuid].AccessToken}")
+					.WithUnvalidatedHeader("X-PSU-IP", GetPublicIP())
+						.Build();
+
+				(HttpStatusCode status, string response) = await httpService.SendAsyncDisposeAndGetResponse(request, CancellationToken.None);
+
+				var success = status == HttpStatusCode.OK;
+
+				if (success)
+				{
+					var transactions = JsonSerializer.Deserialize<ResultsHostDto<TransactionDto>>(response).Results;
+					result.AddRange(transactions.Where(x => !result.Any(y => y.NormalisedProviderId == x.NormalisedProviderId)));
+				}
+
+				return result;
+			});
 		}
 
 		#endregion
@@ -238,6 +312,12 @@ namespace FinanceTracker.Core.Services
 		private void LinkedBank_NewBankLinkStatus(object? sender, BankLinkStatus e)
 		{
 			NewBankLinkStatusForGuid?.Invoke(this, ((sender as LinkedBankModel).Guid, e));
+		}
+
+		public void Dispose()
+		{
+			bankLinkValidationTimer.Stop();
+			bankLinkValidationTimer.Dispose();
 		}
 
 		private void BlockingPolicy(Action functor)
