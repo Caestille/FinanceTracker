@@ -104,7 +104,7 @@
 					Height="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type controls:ExtendedButton}}, Path=ActualHeight, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}"
 					Margin="-1,0,0,0">
 					<Line
-						Stroke="{DynamicResource StatusTextBrush}"
+						Stroke="{DynamicResource TextBrush}"
 						StrokeEndLineCap="Triangle"
 						StrokeThickness="4"
 						X1="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-4}"
@@ -112,7 +112,7 @@
 						Y1="4"
 						Y2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualHeight, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}" />
 					<Line
-						Stroke="{DynamicResource StatusTextBrush}"
+						Stroke="{DynamicResource TextBrush}"
 						StrokeThickness="4"
 						X1="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-1}"
 						X2="{Binding RelativeSource={RelativeSource FindAncestor, AncestorType={x:Type Grid}}, Path=ActualWidth, Converter={StaticResource ValueAdderConverter}, ConverterParameter=-3}"
@@ -578,7 +578,7 @@
 					</Border.OpacityMask>
 					<Border.Effect>
 						<DropShadowEffect
-							BlurRadius="30"
+							BlurRadius="20"
 							ShadowDepth="0"
 							Opacity="0.5"
 							Color="Black" />
