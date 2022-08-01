@@ -25,11 +25,32 @@ namespace FinanceTracker.Core.Models
 			set => SetProperty(ref outValue, value);
 		}
 
+		private double runningBalance;
+		public double RunningBalance
+		{
+			get => runningBalance;
+			set => SetProperty(ref runningBalance, value);
+		}
+
+		private string merchant;
+		public string Merchant
+		{
+			get => merchant;
+			set => SetProperty(ref merchant, value);
+		}
+
 		private string description;
 		public string Description
 		{
 			get => description;
 			set => SetProperty(ref description, value);
+		}
+
+		private string location;
+		public string Location
+		{
+			get => location;
+			set => SetProperty(ref location, value);
 		}
 
 		private string tag;
