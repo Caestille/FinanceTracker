@@ -22,6 +22,6 @@ namespace FinanceTracker.Core.DataTypeObjects
 		public string RefreshToken { get; set; }
 
 		[JsonPropertyName("scope")]
-		public IEnumerable<string> Scope { get; set; }
+		public string Scope { get; set; }
 	}
 }

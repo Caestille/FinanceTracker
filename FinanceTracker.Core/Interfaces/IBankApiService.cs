@@ -15,7 +15,11 @@ namespace FinanceTracker.Core.Interfaces
 
 		Task<IEnumerable<AccountDto>> GetAccounts(Guid bankGuid);
 
-		Task<IEnumerable<TransactionDto>> GetTransactions(Guid bankGuid, string accountId);
+		Task<IEnumerable<CardDto>> GetCards(Guid bankGuid);
+
+		Task<IEnumerable<TransactionDto>> GetTransactions(Guid bankGuid, string accountName);
+
+		Task<IEnumerable<TransactionDto>> GetCardTransactions(Guid bankGuid, string accountName);
 
 		void Dispose();
 	}

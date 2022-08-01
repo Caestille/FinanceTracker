@@ -19,6 +19,9 @@ namespace FinanceTracker.Core.DataTypeObjects
 		[JsonPropertyName("transaction_classification")]
 		public IEnumerable<string> Classification { get; set; }
 
+		[JsonPropertyName("merchant_name")]
+		public string MerchantName { get; set; }
+
 		[JsonPropertyName("amount")]
 		public double Amount { get; set; }
 
@@ -34,9 +37,16 @@ namespace FinanceTracker.Core.DataTypeObjects
 		[JsonPropertyName("normalised_provider_transaction_id")]
 		public string NormalisedProviderId { get; set; }
 
+		// Currency
+		// Amount
 		[JsonPropertyName("running_balance")]
 		public TransactionRunningBalanceDto RunningBalance { get; set; }
 
+		// ProviderMerchantName
+		// Address
+		// ProviderCategory
+		// Type
+		// ProviderId
 		[JsonPropertyName("meta")]
 		public MetadataDto Metadata { get; set; }
 	}

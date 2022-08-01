@@ -82,7 +82,6 @@ namespace FinanceTracker.Core.ViewModels
 			set => SetProperty(ref creditCardsViewModel, value);
 		}
 
-
 		public BankViewModel(IBankApiService bankApiService, IRegistryService registryService, string name, Guid bankGuid) : base(name)
 		{
 			SupportsDeleting = true;
@@ -175,7 +174,7 @@ namespace FinanceTracker.Core.ViewModels
 		private async Task DownloadData()
 		{
 			IsDownloadingData = true;
-			var results = new List<TransactionModel>();
+
 			var accounts = await truelayerService.GetAccounts(bankGuid);
 			await Parallel.ForEachAsync(accounts, async (account, token) =>
 			{
@@ -195,6 +194,28 @@ namespace FinanceTracker.Core.ViewModels
 				}
 				catch { }
 			});
+
+			var creditCards = await truelayerService.GetCards(bankGuid);
+			await Parallel.ForEachAsync(creditCards, async (creditCard, token) =>
+			{
+				try
+				{
+					var name = creditCard.DisplayName;
+					var childrenContainsCard = CreditCardsViewModel.ChildViewModels.Any(x => (x as AccountViewModel).OriginalName == name);
+					AccountViewModel? creditCardVm = Application.Current.Dispatcher.Invoke(() =>
+						childrenContainsCard
+							? CreditCardsViewModel.ChildViewModels.First(x => (x as AccountViewModel).OriginalName == name) as AccountViewModel
+							: new AccountViewModel(truelayerService, registryService, name, bankGuid, Guid.NewGuid(), false));
+					creditCardVm.IsCreditCard = true;
+					if (!childrenContainsCard && creditCardVm != null)
+					{
+						Application.Current.Dispatcher.Invoke(() => CreditCardsViewModel.AddChild(creditCardVm));
+					}
+					creditCardVm?.DownloadCardTransactions();
+				}
+				catch { }
+			});
+
 			IsDownloadingData = false;
 		}
 

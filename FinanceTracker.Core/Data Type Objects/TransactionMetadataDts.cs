@@ -4,6 +4,12 @@ namespace FinanceTracker.Core.DataTypeObjects
 {
 	public class MetadataDto
 	{
+		[JsonPropertyName("provider_merchant_name")]
+		public string ProviderMerchantName { get; set; }
+
+		[JsonPropertyName("address")]
+		public string Address { get; set; }
+
 		[JsonPropertyName("provider_category")]
 		public string ProviderCategory { get; set; }
 

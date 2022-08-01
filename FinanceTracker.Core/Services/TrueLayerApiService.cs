@@ -19,6 +19,7 @@ namespace FinanceTracker.Core.Services
 		private string callbackUri = @"http://localhost:3000/";
 
 		private bool isRequestExecuting;
+		private string publicIp;
 
 		private IRegistryService registryService;
 		private IHttpService httpService;
@@ -36,6 +37,8 @@ namespace FinanceTracker.Core.Services
 			bankLinkValidationTimer.AutoReset = true;
 			bankLinkValidationTimer.Elapsed += BankLinkValidationTimer_Elapsed;
 			bankLinkValidationTimer.Start();
+
+			publicIp = GetPublicIP();
 		}
 
 		#region Linking
@@ -241,27 +244,6 @@ namespace FinanceTracker.Core.Services
 			});
 		}
 
-		public static string GetPublicIP()
-		{
-			try
-			{
-				string url = "http://checkip.dyndns.org";
-				System.Net.WebRequest req = System.Net.WebRequest.Create(url);
-				System.Net.WebResponse resp = req.GetResponse();
-				System.IO.StreamReader sr = new System.IO.StreamReader(resp.GetResponseStream());
-				string response = sr.ReadToEnd().Trim();
-				string[] a = response.Split(':');
-				string a2 = a[1].Substring(1);
-				string[] a3 = a2.Split('<');
-				string a4 = a3[0];
-				return a4;
-			}
-			catch
-			{
-				return "";
-			}
-		}
-
 		public async Task<IEnumerable<TransactionDto>> GetTransactions(Guid bankGuid, string accountName)
 		{
 			return await BlockingPolicy(async () =>
@@ -274,7 +256,68 @@ namespace FinanceTracker.Core.Services
 					$"https://api.truelayer.com/data/v1/accounts/{accountId}/transactions?to={(DateTime.Now - TimeSpan.FromHours(6)).ToString("yyyy-MM-dd")}&from={(DateTime.Now - TimeSpan.FromDays(2 * 367)).ToString("yyyy-MM-dd")}")
 					.WithUnvalidatedHeader("Accept", "application/json")
 					.WithUnvalidatedHeader("Authorization", $"Bearer {bankLinks[bankGuid].AccessToken}")
-					.WithUnvalidatedHeader("X-PSU-IP", GetPublicIP())
+					.WithUnvalidatedHeader("X-PSU-IP", publicIp)
+						.Build();
+
+				(HttpStatusCode status, string response) = await httpService.SendAsyncDisposeAndGetResponse(request, CancellationToken.None);
+
+				var success = status == HttpStatusCode.OK;
+
+				if (success)
+				{
+					var transactions = JsonSerializer.Deserialize<ResultsHostDto<TransactionDto>>(response).Results;
+					result.AddRange(transactions.Where(x => !result.Any(y => y.NormalisedProviderId == x.NormalisedProviderId)));
+				}
+
+				return result;
+			});
+		}
+
+		public async Task<IEnumerable<CardDto>> GetCards(Guid bankGuid)
+		{
+			return await BlockingPolicy(async () =>
+			{
+				var request = httpService.GetHttpRequestBuilder()
+					.CreateRequest(IHttpRequestBuilder.HttpCommandType.Get, "https://api.truelayer.com/data/v1/cards")
+						.WithUnvalidatedHeader("Accept", "application/json")
+						.WithUnvalidatedHeader("Authorization", $"Bearer {bankLinks[bankGuid].AccessToken}")
+							.Build();
+
+				(HttpStatusCode status, string response) = await httpService.SendAsyncDisposeAndGetResponse(request, tokenSource.Token);
+
+				var success = status == HttpStatusCode.OK;
+
+				var result = new List<CardDto>();
+
+				if (success)
+				{
+					var cards = JsonSerializer.Deserialize<ResultsHostDto<CardDto>>(response).Results;
+					Dictionary<string, string> accountIdMaps = new Dictionary<string, string>();
+					foreach (var card in cards)
+					{
+						accountIdMaps[card.DisplayName] = card.AccountId;
+					}
+					bankLinks[bankGuid].AccountNamesAndIds = accountIdMaps;
+					result.AddRange(cards);
+				}
+
+				return result;
+			});
+		}
+
+		public async Task<IEnumerable<TransactionDto>> GetCardTransactions(Guid bankGuid, string accountName)
+		{
+			return await BlockingPolicy(async () =>
+			{
+				var accountId = bankLinks[bankGuid].AccountNamesAndIds[accountName];
+
+				var result = new List<TransactionDto>();
+				var request = httpService.GetHttpRequestBuilder()
+				.CreateRequest(IHttpRequestBuilder.HttpCommandType.Get,
+					$"https://api.truelayer.com/data/v1/cards/{accountId}/transactions?to={(DateTime.Now - TimeSpan.FromHours(6)).ToString("yyyy-MM-dd")}&from={(DateTime.Now - TimeSpan.FromDays(2 * 367)).ToString("yyyy-MM-dd")}")
+					.WithUnvalidatedHeader("Accept", "application/json")
+					.WithUnvalidatedHeader("Authorization", $"Bearer {bankLinks[bankGuid].AccessToken}")
+					.WithUnvalidatedHeader("X-PSU-IP", publicIp)
 						.Build();
 
 				(HttpStatusCode status, string response) = await httpService.SendAsyncDisposeAndGetResponse(request, CancellationToken.None);
@@ -356,6 +399,27 @@ namespace FinanceTracker.Core.Services
 			var result = await functor();
 			isRequestExecuting = false;
 			return result;
+		}
+
+		public static string GetPublicIP()
+		{
+			try
+			{
+				string url = "http://checkip.dyndns.org";
+				WebRequest req = WebRequest.Create(url);
+				WebResponse resp = req.GetResponse();
+				StreamReader sr = new StreamReader(resp.GetResponseStream());
+				string response = sr.ReadToEnd().Trim();
+				string[] a = response.Split(':');
+				string a2 = a[1].Substring(1);
+				string[] a3 = a2.Split('<');
+				string a4 = a3[0];
+				return a4;
+			}
+			catch
+			{
+				return "";
+			}
 		}
 	}
 }

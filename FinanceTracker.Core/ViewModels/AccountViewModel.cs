@@ -92,6 +92,12 @@ namespace FinanceTracker.Core.ViewModels
 			Total = what.First().RunningBalance.Amount;
 		}
 
+		public async Task DownloadCardTransactions()
+		{
+			var what = await truelayerService.GetCardTransactions(parentBankGuid, OriginalName);
+			Total = what.Sum(x => x.Amount);
+		}
+
 		protected override void Select()
 		{
 			Messenger.Send(new ViewModelRequestShowMessage(this, typeof(BankViewModel)));
